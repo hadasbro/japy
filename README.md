@@ -442,3 +442,230 @@ class CarShort extends Vehicle {
 
 #### Method signatures
 
+#### Python
+
+Example 1
+```python
+def f(x, y, w=0, h=0):
+    print "position: %s, %s -- shape: %s, %s"%(x, y, w, h)
+
+position = (3,4)
+size = {'h': 10, 'w': 20}
+
+>>> f( *position, **size)
+position: 3, 4 -- shape: 20, 10
+```
+
+Example 2
+```python
+def f(*args, **kwargs):
+    print "the positional arguments are:", args
+    print "the keyword arguments are:", kwargs
+
+In [389]: f(2, 3, this=5, that=7)
+the positional arguments are: (2, 3)
+the keyword arguments are: {'this': 5, 'that': 7}
+```
+
+#### Java
+Example 1
+```java
+@Data
+class CarAnother extends Vehicle {
+
+    /**
+     * doSomething - method with many params of many kinds
+     *
+     * @param a
+     * @param b
+     * @param strObject
+     * @param car
+     * @param vehicles
+     * @param anything
+     */
+    public void doSomething(int a, char b, String strObject, Car car, List<Vehicle> vehicles, Object anything) {
+
+        a += 1;
+        strObject.trim();
+        car.setName("Newname");
+        vehicles.stream().forEach(Vehicle::drive);
+
+    }
+
+    /**
+     * doSomething - method with many params - collections and arrays
+     *
+     * @param vehicles
+     * @param colOfVehicles
+     * @param integers
+     * @param cars
+     */
+    public void doSomething(Set<Vehicle> vehicles, Collection<? extends Vehicle> colOfVehicles, int[] integers, Car[] cars) {}
+
+    /**
+     * doSomethingOnSetsOfVehicles - varargs of sets of vehicles
+     *
+     * @param setsOfVehicles
+     */
+    public void doSomethingOnSetsOfVehicles(Set<Vehicle> ... setsOfVehicles) {
+        for (Set<Vehicle> setv : setsOfVehicles) {
+            System.out.println(setv.toArray());
+        }
+    }
+
+    /**
+     * doSomethingOnManyStrings - varargs with strings
+     *
+     * @param str
+     */
+    public void doSomethingOnManyStrings(String ...str) {
+
+        String res = Arrays.stream(str)
+                .map(String::trim)
+                .collect(Collectors.joining(" "));
+
+        System.out.println(res);
+
+    }
+
+    /**
+     * joinDictionaries - join dictionaries, no matter how many
+     * here we have varargs of maps and filter predicate as a positional parameter
+     *
+     * @param filter
+     * @param dicts
+     */
+    public void joinDictionaries(Predicate<Map<String, Integer>> filter, Map<String, Integer>...dicts) {
+
+        Map<String, Integer> mergedMap = Arrays.stream(dicts).filter(filter)
+
+                .map(Map::entrySet)
+                .flatMap(Collection::stream)
+                .collect(
+                        Collectors.toMap(
+                                Map.Entry::getKey,
+                                Map.Entry::getValue,
+                                Integer::max
+                        )
+                );
+
+        System.out.println(mergedMap);
+
+    }
+}
+
+```
+Test
+```java
+public class Main {
+    public static void main(String[] args) {
+
+        CarAnother carAnother = new CarAnother();
+
+        // Example 1 - varargs
+        carAnother.doSomethingOnManyStrings("one", "two", "three", "four"); // one two three four
+
+        // the same function but more params
+        carAnother.doSomethingOnManyStrings("one", "two", "three", "four", "five", "six"); // one two three four five six
+
+
+        // Example 2 - varargs of sets
+        Map<String, Integer> dict1 = new HashMap<String, Integer>() {{
+            put("key1", 1);
+            put("key2", 2);
+        }};
+
+        Map<String, Integer> dict2 = new HashMap<String, Integer>() {{
+            put("key3", 3);
+            put("key4", 4);
+        }};
+
+        Map<String, Integer> dict3 = new HashMap<String, Integer>() {{
+            put("key5", 5);
+        }};
+
+        // run on 2 dictionaries
+        carAnother.joinDictionaries(dict -> dict.size() > 0, dict1, dict2); // {key1=1, key2=2, key3=3, key4=4}
+
+        // run on 3 dictionaries (no matter how many dictionaries we want to use - it will work properly)
+        carAnother.joinDictionaries(dict -> dict.size() > 0, dict1, dict2, dict3); // {key1=1, key2=2, key5=5, key3=3, key4=4}
+
+        List<Vehicle> vehicles = new ArrayList<>();
+        Set<Vehicle> uniqueVehicles = new HashSet<>(vehicles);
+        Car[] cars = new Car[2];
+
+        // run method with mane different params
+        carAnother.doSomething(1, 'x', "str", new Car("",""), vehicles, null);
+
+        // run method with mane different params (collections and arrays)
+        carAnother.doSomething(uniqueVehicles, vehicles, new int[]{1,2,3}, cars);
+
+    }
+}
+```
+
+Simulateing Python's Dictionary parameters.
+
+```java
+@Data
+class CarAnother extends Vehicle {
+
+    /**
+     * doSomethingOnDictParams
+     *
+     * @param normalPositionalParam - normal integer param on first position
+     * @param dict - map/dictionary
+     * @param strParams - vararg (we can put here many strings)
+     */
+    public void doSomethingOnDictParams(int normalPositionalParam, Map<String, String> dict, String ...strParams) {
+
+        String res = Arrays.stream(strParams).collect(Collectors.joining(" "));
+
+        System.out.println(normalPositionalParam);
+        System.out.println(dict);
+        System.out.println(res);
+
+    }
+}
+```
+
+Testing with few dictionary creation approaches.
+```java
+public class Main {
+    public static void main(String[] args) {
+
+        CarAnother carAnother = new CarAnother();
+
+        // dict, style 1
+        Map<String, String> myDict = new HashMap<>();
+        myDict.put("key1", "val1");
+        myDict.put("key2", "val2");
+
+        // dict, style 2
+        Map<String, String> myDict2 = Stream.of(new String[][] {
+                { "key1", "val1" },
+                { "key2", "val2" },
+        }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
+
+
+        // dict, style 3
+        Map<String, String> myDict3 = Map.of(
+                "key1", "val1",
+                "key2", "val2"
+        );
+
+        // dict, style 4
+        Map<String, String> myMap = new HashMap<>() {{
+            put("key1", "val1");
+            put("key2", "val2");
+        }};
+
+        // testing
+        carAnother.doSomethingOnDictParams(12, myDict,"a");
+        carAnother.doSomethingOnDictParams(12, myDict2,"a");
+        carAnother.doSomethingOnDictParams(12, myDict3,"a");
+        carAnother.doSomethingOnDictParams(12, myDict, "a", "b", "c");
+        carAnother.doSomethingOnDictParams(12, myDict, "a", "b", "c", "d", "e");
+    }
+}
+```
