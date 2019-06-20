@@ -1,9 +1,9 @@
 
 ## Data structures
 
-#### List comprehension
+### List comprehension
 
-* Python
+#### Python
 ```python
 
 # Example 1
@@ -22,7 +22,7 @@ fruit = ["Apples", "Peaches", "Pears", "Bananas"]
 # [(1, 'Peaches'), (1, 'Pears'), (3, 'Peaches'), (3, 'Pears')]
 ```
 
-* Java
+#### Java
 
 in Java there is not simple equivalent for Python's syntax. 
 We can use Java Streams (Java 8+), additional Java libraries e.g. https://github.com/farolfo/list-comprehensions-in-java
@@ -62,10 +62,10 @@ public class Main {
 
 
 
-##### Object encapsulation
+#### Object encapsulation
 
 
-* Python
+#### Python
 
 ```python
 
@@ -221,7 +221,7 @@ print(user.email) # OK (get Email through descriptor), result: test@mail.com
 
 ```
 
-* Java
+#### Java
 
 ```java
 
