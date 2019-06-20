@@ -137,6 +137,11 @@ class Car(Vehicle):
     def getSpeedInKmPerHour(speedInMilesPerHour):
         return speedInMilesPerHour * 1.60
 
+```
+
+Test
+```python
+
 
 
 
@@ -224,58 +229,216 @@ print(user.email) # OK (get Email through descriptor), result: test@mail.com
 #### Java
 
 ```java
+interface VehicleInterface {
+    void drive();
+}
 
-// class with private constructor and builder as an inner class inside
+class Vehicle implements VehicleInterface {
+    /**
+     * interfaces' method implementation
+     */
+    public void drive() {}
 
-public class House {
+    /**
+     * doSomethingInProtected - Protected method
+     *
+     * @return boolean
+     */
+    protected boolean doSomethingInProtected(){
+        return true;
+    }
+}
 
-    String adress;
-    Integer floorsNumer;
-    Integer doorsNumber;
+/**
+* Class can be public, private or protected (inner class) or 
+* can don't have any modifier
+*/
+public class Car extends Vehicle {
 
-    // private constructor to disallow developer to instantiate class via this constructor
-    // this constructor will be used only internally, in the self::build() method
+    /**
+     * public static property
+     */
+    public static int staticProperty = 1;
 
-    private House(String adress, Integer floorsNumer, Integer doorsNumber) {
-        this.adress = adress;
-        this.floorsNumer = floorsNumer;
-        this.doorsNumber = doorsNumber;
+    /**
+     * constant
+     */
+    public static final char CONSTANT = 'C';
+
+    /**
+     * getName - getter for provate property
+     *
+     * @return
+     */
+    public String getName() {
+        return name;
     }
 
-    // Builder as an inner class inside our outer class
+    /**
+     * setName - setter for provate property
+     *
+     * @param name
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public static class HouseBuilder {
+    /**
+     * private property name
+     * (access only in this class)
+     */
+    private String name;
 
-        // some default values (recommended)
-        // here we can set up default values we want to have if they are not settled
+    /**
+     * property without any modifier
+     * (access in the same package, in class and subclasses but only in the same package)
+     */
+    String supername;
 
-        private String adress;
-        private Integer floorsNumer = 1;
-        private Integer doorsNumber = 1;
+    /**
+     * protected property shortname
+     * (access in the same package, in class and subclasses in any package)
+     */
+    protected String shortname;
 
-        public HouseBuilder setAdress(String adress) {
-            this.adress = adress;
-            return this;
-        }
+    /**
+     * public property speed
+     * (access everywhere, even outside the package)
+     */
+    public Integer speed = 100;
 
-        public HouseBuilder setFloorsNumer(Integer floorsNumer) {
-            this.floorsNumer = floorsNumer;
-            return this;
-        }
+    /**
+     * Constructor
+     *
+     * @param name
+     * @param supername
+     * @param shortname
+     */
+    Car(String name, String supername, String shortname) {
 
-        public HouseBuilder setDoorsNumber(Integer doorsNumber) {
-            this.doorsNumber = doorsNumber;
-            return this;
-        }
+        this.name = name;
+        this.supername = supername;
+        this.shortname = shortname;
 
+        // call protected method in subclass
+        this.doSomethingInProtected();
 
-        public House build() {
+        // call private (possible only in this class)
+        this.doSomethingInPrivate();
 
-            // Inner class HouseBuilder has an access to provate constructor
-            // from outer class House, so we can instantiate House object here
+        // run static method (outside the object context)
+        Car.doSomethingStatically();
+    }
 
-            return new House(adress, floorsNumer, doorsNumber);
-        }
+    /**
+     * Another constructor with different signature
+     *
+     * @param name
+     * @param supername
+     */
+    Car(String name, String supername) {
+        this(name, supername, "Default name");
+    }
+
+    /**
+     * doSomethingInPublic - Public method
+     *
+     * @return boolean
+     */
+    public boolean doSomethingInPublic(){
+        return true;
+    }
+
+    /**
+     * doSomethingInPrivate - Private method
+     *
+     * @return boolean
+     */
+    private boolean doSomethingInPrivate(){
+        return true;
+    }
+
+    /**
+     * doSomethingStatically - public static method
+     *
+     * @return
+     */
+    public static boolean doSomethingStatically(){
+        return true;
+    }
+
+}
+```
+
+Testing
+```java
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("test");
+
+        Car car = new Car("Truck","My great car");
+
+        // set private property through setter
+        car.setName("Carname");
+
+        // get private property through getter
+        System.out.println(car.getName());
+
+        // access to protected properties (access in the same package, in class and subclasses in any package)
+        car.shortname = "Shortname";
+        System.out.println(car.shortname); // Shortname
+
+        // access to public property (access everywhere, even outside the package)
+        System.out.println(car.speed ); // 100
+
+        // car.doSomethingInPrivate(); // this doesnt work (method is private)
+
+        car.doSomethingInProtected(); // this will work (the same package)
+
+        // call static method in class', not an object context
+        Car.doSomethingStatically();
+
+        // call public method in object's context
+        car.doSomethingInPublic();
+
+        // use static property
+        System.out.println(Car.staticProperty); // 1
+
+        // public constant
+        System.out.println(Car.CONSTANT); // C
+
     }
 }
 ```
+
+
+Lombok style (@see https://projectlombok.org)
+
+```java
+
+/**
+ * CarShort
+ *
+ * Lombok Style
+ * all properties are private and there are Getters and Setters for each one
+ * also constructor with required args (see @NonNull annotation)
+ */
+@Data
+class CarShort extends Vehicle {
+
+    public static int staticProperty = 1;
+    public static final char CONSTANT = 'C';
+
+    @NonNull // if we want to have this property in "Required args constructor"
+    private String name;
+    private String supername;
+    private String shortname;
+    private Integer speed = 100;
+
+}
+```
+
+* * *
+
+#### Method signatures
+
