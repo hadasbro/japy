@@ -1,7 +1,9 @@
 
 ## Data structures
 
-### List comprehension
+### Collections
+
+## List comprehension
 
 #### Python
 ```python
@@ -41,10 +43,9 @@ public class Main {
                         .map(n -> Math.pow(n, 2)).map(Double::intValue)
                         .collect(Collectors.toList());
 
-        // [0, 4, 16, 36, 64]
+                // [0, 4, 16, 36, 64]
 
-        // Example 2
-        // https://github.com/farolfo/list-comprehensions-in-java
+        // Example 2 (https://github.com/farolfo/list-comprehensions-in-java)
         Predicate<Integer> even = x -> x % 2 == 0;
 
         List<Integer> evens = new ListComprehension<Integer>()
@@ -52,7 +53,8 @@ public class Main {
                     x.belongsTo(Arrays.asList(1, 2, 3, 4));
                     x.is(even);
                 });
-        // evens = {2,4};
+        
+            // evens = {2,4};
 
     }
 }
@@ -63,8 +65,7 @@ public class Main {
 
 
 
-#### Object encapsulation
-
+## Object encapsulation
 
 #### Python
 
@@ -368,6 +369,7 @@ public class Car extends Vehicle {
 ```
 
 Testing
+
 ```java
 public class Main {
     public static void main(String[] args) {
@@ -437,7 +439,7 @@ class CarShort extends Vehicle {
 
 * * *
 
-#### Method signatures & type hints
+## Method signatures & type hints
 
 #### Python
 
@@ -465,7 +467,6 @@ test_function(*arg_tuple, **arg_dictionary)
 
 Example 2
 ```python
-
 
 def test_function2(arg1: List[Any], *args: int, **kwargs: str) -> None:
     print(arg1)
@@ -767,7 +768,7 @@ public class Main {
 }
 ```
 
-### Errors & exceptions handling
+## Errors & exceptions handling
 
 #### Python
 ```python
@@ -811,6 +812,8 @@ finally:
 
 #### Java
 
+Example 1:
+
 ```java
 
 class MyException extends Exception{
@@ -828,14 +831,11 @@ class MyError extends Error{
 public class Main {
 
     public static void main(String[] args) {
-
-      
+        
         try {
             if(1==1)
                 throw new MyException("My test msg");
-
-            // int b = 1/0; // exception
-
+            
         // catch concrete exception object
         } catch (MyException e){
             System.out.println("MyException throwed. Msg: " + e.getMessage());
@@ -873,5 +873,21 @@ public class Main {
 }
 ```
 
+Example 2 (try - catch with resources)
+
+```java
+public class Main {
+
+    public static void main(String[] args) {
+        
+        String path = "/";
+        
+        try(BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(path))) {
+            // ...
+        } catch (IOException e) {e.printStackTrance();}
+        
+    }
+}
+```
 
 * * *
