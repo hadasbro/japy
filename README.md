@@ -100,20 +100,20 @@ Possible classes:
 
 general schema: Immutable[XXX]
 examples:
-- [ ] ImmutableCollection
-- [ ] ImmutableList
-- [ ] ImmutableSet
-- [ ] ImmutableSortedSet
-- [ ] ImmutableMap
-- [ ] ImmutableSortedMap
-- [ ] ImmutableMultiset
-- [ ] ImmutableSortedMultiset
-- [ ] ImmutableMultimap
-- [ ] ImmutableListMultimap
-- [ ] ImmutableSetMultimap
-- [ ] ImmutableBiMap
-- [ ] ImmutableClassToInstanceMap
-- [ ] ImmutableTable
+- ImmutableCollection
+- ImmutableList
+- ImmutableSet
+- ImmutableSortedSet
+- ImmutableMap
+- ImmutableSortedMap
+- ImmutableMultiset
+- ImmutableSortedMultiset
+- ImmutableMultimap
+- ImmutableListMultimap
+- ImmutableSetMultimap
+- ImmutableBiMap
+- ImmutableClassToInstanceMap
+- ImmutableTable
 
 See more: https://github.com/google/guava/wiki/ImmutableCollectionsExplained
 
