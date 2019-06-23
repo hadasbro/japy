@@ -5,20 +5,21 @@
 
 #### Python
 ```python
+from typing import *
 
 # Example 1
-list_using_comp = [var**2 for var in range(1, 10) if x%2 == 0] 
+list_using_comp: List[int] = [var ** 2 for var in range(1, 10) if var % 2 == 0]
 # [4, 16, 36, 64]
 
 # Example 2
-char_list = ['', '    a','b', '\t']
+char_list: List[chr] = ['', '    a', 'b', '\t']
 [x.strip() for x in char_list if x.strip()]
 # ['a', 'b']
 
 # Example 3
-nums = [1, 2, 3, 4]
-fruit = ["Apples", "Peaches", "Pears", "Bananas"]
-[(i, f) for i in nums for f in fruit if f[0] == "P" if i%2 == 1]
+nums: List[int] = [1, 2, 3, 4]
+fruit: List[str] = ["Apples", "Peaches", "Pears", "Bananas"]
+[(i, f) for i in nums for f in fruit if f[0] == "P" if i % 2 == 1]
 # [(1, 'Peaches'), (1, 'Pears'), (3, 'Peaches'), (3, 'Pears')]
 ```
 
@@ -69,17 +70,17 @@ public class Main {
 
 ```python
 
-# !/usr/bin/env python
 class Vehicle:
     pass
 
+
 class Car(Vehicle):
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'Car({[self.__name, self.speed, self._shortname]!r})'
 
-    def __init__(self, name="MyCar", speed=100, shortname="car short", supername="super"):
-
+    def __init__(self, name: str = "MyCar", speed: int = 100, shortname: str = "car short",
+                 supername: str = "super") -> None:
         # private field
         self.__name = name
 
@@ -96,45 +97,45 @@ class Car(Vehicle):
         self.__privateMethod()
 
     # setter for private field
-    def set_name(self, name):
+    def set_name(self, name: str) -> None:
         self.__name = name + "[setter 1]"
 
     # getter for private field
-    def get_name(self):
+    def get_name(self) -> str:
         return self.__name + "[getter 1]"
 
     # getter by property decorator
     @property
-    def supername(self):
+    def supername(self) -> str:
         return self.__supername + "[getter 2]"
 
     # setter by property decorator
     @supername.setter
-    def supername(self, supername):
+    def supername(self, supername: str) -> None:
         self.__supername = supername + "[setter 2]"
         print(self.__supername)
 
     # deleter by decorator
     @supername.deleter
-    def supername(self):
+    def supername(self) -> None:
         del self.__supername
 
     # private method
-    def __privateMethod(self):
+    def __privateMethod(self) -> None:
         print("__privateMethod")
 
     # public method
-    def publicMethod(self):
+    def publicMethod(self) -> None:
         pass
 
     # public class method (is bound to the class object itself)
     @classmethod
-    def giveMeAnyFastCar(cls, speed = 200):
+    def giveMeAnyFastCar(cls: 'Car', speed: int = 200) -> 'Car':
         return cls("Fast Car", speed)
 
     # static method (knows nothing about the class and just deals with the parameters)
     @staticmethod
-    def getSpeedInKmPerHour(speedInMilesPerHour):
+    def getSpeedInKmPerHour(speedInMilesPerHour: int):
         return speedInMilesPerHour * 1.60
 
 ```
@@ -142,10 +143,7 @@ class Car(Vehicle):
 Test
 ```python
 
-
-
-
-car = Car()
+car: Car = Car()
 
 # get name via getter
 print("1. " + car.get_name())
@@ -178,35 +176,33 @@ car.publicMethod()
 car.publicMethod()  # OK
 
 # class method usage
-fast_car = Car.giveMeAnyFastCar(300)
-print(fast_car) # Car(['Fast Car', 300, 'car short'])
+fast_car: Car = Car.giveMeAnyFastCar(300)
+print(fast_car)  # Car(['Fast Car', 300, 'car short'])
 
 # static method usage
-speed = Car.getSpeedInKmPerHour(100)
-print(speed) # 160.0
+speed: int = Car.getSpeedInKmPerHour(100)
+print(speed)  # 160.0
 ```
 
 Descriptor example
 
 ```pyhton
-
 class Email():
-
-    EMAIL_REGEX = re.compile(
+    EMAIL_REGEX: Pattern[str] = re.compile(
         r"[A-Za-z0-9-_]+(.[A-Za-z0-9-_]+)*@"
         "[A-Za-z0-9-]+(.[A-Za-z0-9]+)*(.[A-Za-z]{2,})"
     )
 
     """Descriptor class for an email address."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.pool = {}
 
-    def __get__(self, instance, owner):
+    def __get__(self, instance: Any, owner: Any) -> Any:
         print("get Email through descriptor")
         return self.pool.get(instance, 0)
 
-    def __set__(self, instance, email_address):
+    def __set__(self, instance: Any, email_address: str) -> None:
         if not Email.EMAIL_REGEX.match(email_address):
             raise ValueError
         print("set Email through descriptor")
@@ -214,15 +210,16 @@ class Email():
 
 
 class User:
-    email = Email()
-    def __init__(self, name, email):
+    email: Email = Email()
+
+    def __init__(self, name: str, email: str) -> None:
         self.email = email
         self.name = name
 
-# test get/set through descriptor
-user = User("Sla", "test@mail.com") # OK (set Email through descriptor)
-print(user.email) # OK (get Email through descriptor), result: test@mail.com
 
+# test get/set through descriptor
+user: User = User("Sla", "test@mail.com")  # OK (set Email through descriptor)
+print(user.email)  # OK (get Email through descriptor), result: test@mail.com
 
 ```
 
@@ -440,31 +437,130 @@ class CarShort extends Vehicle {
 
 * * *
 
-#### Method signatures
+#### Method signatures & type hints
 
 #### Python
 
 Example 1
 ```python
-def f(x, y, w=0, h=0):
-    print "position: %s, %s -- shape: %s, %s"%(x, y, w, h)
+from typing import *
 
-position = (3,4)
-size = {'h': 10, 'w': 20}
+# function wirh some positional params
+def test_function(x: int, y: int, w: int = 0, h: int = 0) -> None:
+    print("x: %s, y: %s, w: %s, h: %s" % (x, y, w, h))
 
->>> f( *position, **size)
-position: 3, 4 -- shape: 20, 10
+
+# normal function call
+test_function(1, 2, 3, 4);
+# x: 1, y: 2, w: 3, h: 4
+
+# arguments unpacking function call
+arg_tuple: Tuple[int] = (1, 2)
+arg_dictionary: Dict[str, int] = {'w': 20, 'h': 10}
+
+test_function(*arg_tuple, **arg_dictionary)
+
+# x: 1, y: 2, w: 20, h: 10
 ```
 
 Example 2
 ```python
-def f(*args, **kwargs):
-    print "the positional arguments are:", args
-    print "the keyword arguments are:", kwargs
 
-In [389]: f(2, 3, this=5, that=7)
-the positional arguments are: (2, 3)
-the keyword arguments are: {'this': 5, 'that': 7}
+
+def test_function2(arg1: List[Any], *args: int, **kwargs: str) -> None:
+    print(arg1)
+
+    for x in args:
+        print("next arg is: " + str(x))
+
+    print(kwargs)
+    print(kwargs.get("this"), kwargs.get("that"))
+
+
+# another call with explicit parameters
+test_function2([1, 2, "three"], 4, 5, 6, this="this v", that="that v")
+# [1, 2, 'three']
+# next arg is: 4 next arg is: 5 next arg is: 6
+# {'this': 'this', 'that': 'that'}
+# this v that v
+
+# arguments unpacking example
+targs: List[int] = [4, 5, 6]
+targsb: Tuple[int] = (4, 5, 6, 6)
+kwargs: Dict[str, str] = {"this": "this v", "that": "that v"}
+test_function2([], *targs, **kwargs)
+test_function2([], *targsb, **kwargs)
+# the same result as in above example
+```
+
+Example 3
+```python
+
+
+def test_function2(arg1: List[Any], *args: int, **kwargs: str) -> None:
+    print(arg1)
+
+    for x in args:
+        print("next arg is: " + str(x))
+
+    print(kwargs)
+    print(kwargs.get("this"), kwargs.get("that"))
+
+
+# another call with explicit parameters
+test_function2([1, 2, "three"], 4, 5, 6, this="this v", that="that v")
+# [1, 2, 'three']
+# next arg is: 4 next arg is: 5 next arg is: 6
+# {'this': 'this', 'that': 'that'}
+# this v that v
+
+# arguments unpacking example
+targs: List[int] = [4, 5, 6]
+targsb: Tuple[int] = (4, 5, 6, 6)
+kwargs: Dict[str, str] = {"this": "this v", "that": "that v"}
+test_function2([], *targs, **kwargs)
+test_function2([], *targsb, **kwargs)
+# the same result as in above example
+```
+
+More examples:
+```python
+# type aliases
+
+T = TypeVar('T', int, float, complex)
+Vector = Iterable[Tuple[T, T]]
+
+
+def inproduct(v: Vector[T]) -> T:
+    return sum(x * y for x, y in v)
+
+
+def dilate(v: Vector[T], scale: T) -> Vector[T]:
+    return ((x * scale, y * scale) for x, y in v)
+
+
+# generics
+
+T = TypeVar('T')  # Declare type variable
+
+
+def first(l: Sequence[T]) -> T:  # Generic function
+    return l[0]
+
+
+# iterable
+
+def zero_all_vars(vars: Iterable[LoggedVar[int]]) -> None:
+    for var in vars:
+        var.set(0)
+
+
+# union types
+
+def handle_employees(e: Union[Employee, Sequence[Employee]]) -> None:
+    if isinstance(e, Employee):
+        e = [e]
+
 ```
 
 #### Java
@@ -630,6 +726,7 @@ class CarAnother extends Vehicle {
 ```
 
 Testing with few dictionary creation approaches.
+
 ```java
 public class Main {
     public static void main(String[] args) {
@@ -669,3 +766,112 @@ public class Main {
     }
 }
 ```
+
+### Errors & exceptions handling
+
+#### Python
+```python
+class MyException(Exception):
+    def __init__(self, msg: str) -> None:
+        self.msg = msg
+
+
+class MyError(ValueError):
+    def __init__(self, msg: str) -> None:
+        self.msg = msg
+
+
+try:
+    # do something
+    raise MyException("Bad result")
+
+# catch one of exceptions
+except (ZeroDivisionError, RuntimeError, TypeError):
+    print('One of ZeroDivisionError, RuntimeError, TypeError throwed')
+
+# custome Exception
+except MyException as e:
+    print("MyException: ", e.msg)
+
+# general, another exception
+except:
+    print("any other error")
+
+# continue in this block if there is no any exception catched
+else:
+    print("All good, lets continue")
+
+# finally, always active, no matter if any exception throwed or not
+finally:
+    print("finally")
+
+# MyException:  Bad result
+# finally
+```
+
+#### Java
+
+```java
+
+class MyException extends Exception{
+    MyException(String msg){
+        super(msg);
+    }
+}
+
+class MyError extends Error{
+    MyError(String msg){
+        super(msg);
+    }
+}
+
+public class Main {
+
+    public static void main(String[] args) {
+
+      
+        try {
+            if(1==1)
+                throw new MyException("My test msg");
+
+            // int b = 1/0; // exception
+
+        // catch concrete exception object
+        } catch (MyException e){
+            System.out.println("MyException throwed. Msg: " + e.getMessage());
+
+        // catch one of ArrayIndexOutOfBoundsException | NullPointerException exception
+        } catch (ArithmeticException | NullPointerException e){
+            System.out.println("One of ArrayIndexOutOfBoundsException | NullPointerException throwed");
+
+        // catch any other exception
+        } catch(Exception e) {
+            System.out.println("General exception");
+
+        // run this block always - no matter if any exception trowed or not
+        } finally{
+            System.out.println("finally");
+        }
+
+        // MyException throwed. Msg: My test msg
+        // finally
+
+    }
+    
+    /**
+     * testMethod
+     *
+     * method with possible exception to be handled
+     *
+     * @throws MyException
+     */
+    public void testMethod() throws MyException {
+        if(1==1)
+            throw new MyException("My test msg");
+
+    }
+}
+```
+
+
+* * *
