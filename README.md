@@ -1,9 +1,221 @@
 
 ## Data structures
 
-### Collections
+### Lists
+#### Python
+```python
+mlist: List[str] = ["A", "B", "C"]
+mlist.insert(4, "D")  # insert at an index 4
+mlist.sort()  # in place sort
+mlist.remove("C")  # remove first "C" element
+popped: str = mlist.pop(2)  # remove the item at index 2
+mlist.reverse()  # reverse the mlist
+```
+#### Java
+```java
+public class Main {
+    public static void main(String[] args) {
+        List<String> list = new ArrayList<>();
+        list.add("A");
+        list.add("B");
+        list.add("C");
+        list.add(3,"D");
+        Collections.sort(list); //sort
+        list.remove("C"); //remove first "C" element
+        list.remove(2); //remove object at the index 2
+        Collections.reverse(list); //reverse the list
+        int n = list.indexOf("A"); //return the index of first occurrence of "A"
+    }
+}
+```
 
-## List comprehension
+### Tuples
+#### Python
+```python
+words: Tuple[str] = ("A", "B")  # or words = "ABng"
+print("A" in words)  # True
+print(hash(words))  # tuples are hashable
+a,b = words  # or a,b = "A", "B"
+print(a)  # Good
+print(b)  # Morning
+print(len(words))  # 2
+```
+#### Java
+Tuple is just kind of immutable list. There are many ways how to use immutable collections of any kind e.g. Map, List, Set in Java.
+
+a) Older approach (JDK 5)
+```java
+public class Main {
+    public static void main(String[] args) {
+        // Example (immutable list)
+        List<String> list = new ArrayList<String>(Arrays.asList("one", "two", "three"));
+        List<String> unmodifiableList = Collections.unmodifiableList(list);
+    }
+}
+```
+
+
+b) Newer approach (JDK 9 factory methods)
+```java
+public class Main {
+    public static void main(String[] args) {
+        List<String> immutableList = List.of("A", "B");
+        Set<String> immutableSet = Set.of("A", "B");
+        Map<String, String> immutableMap = Map.of("key1", "Value1", "key2", "Value2", "key3", "Value3");
+    }
+}
+```
+
+
+c) Google Guava approach
+An "Immutable collection" can be created in several ways:
+
+- using the copyOf method, for example, ImmutableSet.copyOf(set)
+- using the of method, for example, ImmutableSet.of("a", "b", "c") or ImmutableMap.of("a", 1, "b", 2)
+- using a Builder, for example:
+
+        public static final ImmutableSet<Color> GOOGLE_COLORS =
+            ImmutableSet.<Color>builder()
+               .addAll(WEBSAFE_COLORS)
+               .add(new Color(0, 191, 255))
+               .build();
+           
+```java
+public class Main {
+    public static void main(String[] args) {
+        
+        // Example 1	
+        List<String> list = new ArrayList<String>(Arrays.asList("one", "two", "three"));
+        List<String> unmodifiableList = ImmutableList.copyOf(list);	
+            
+        // Examle 2 (immutable list via builder)
+        List<String> list = new ArrayList<String>(Arrays.asList("one", "two", "three"));
+        ImmutableList<Object> unmodifiableList = ImmutableList.builder().addAll(list).build();
+
+    }
+}
+```
+
+Possible classes:
+
+general schema: Immutable[XXX]
+examples:
+- [ ] ImmutableCollection
+- [ ] ImmutableList
+- [ ] ImmutableSet
+- [ ] ImmutableSortedSet
+- [ ] ImmutableMap
+- [ ] ImmutableSortedMap
+- [ ] ImmutableMultiset
+- [ ] ImmutableSortedMultiset
+- [ ] ImmutableMultimap
+- [ ] ImmutableListMultimap
+- [ ] ImmutableSetMultimap
+- [ ] ImmutableBiMap
+- [ ] ImmutableClassToInstanceMap
+- [ ] ImmutableTable
+
+See more: https://github.com/google/guava/wiki/ImmutableCollectionsExplained
+
+d) Apache Commons approach 
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        
+        // Example 1 (ListUtils)
+        List<String> list = new ArrayList<String>(Arrays.asList("one", "two", "three"));
+        List<String> unmodifiableList = ListUtils.unmodifiableList(list);
+        
+        // Example 2 (Immutable classes from org.apache.commons.lang3.tuple)
+        ImmutablePair<String, List<Integer>> immutablePair = new ImmutablePair<>("A", Arrays.asList(1,2,3));
+        ImmutableTriple<String, Integer, Character> immutableTriple = new ImmutableTriple<>("A", 2, 'x');
+
+    }
+}
+```
+
+e) Java Tuples Library approach (see https://www.javatuples.org/)
+```java
+public class Main {
+    public static void main(String[] args) {
+        // Pair via static factory
+        Pair<String, Integer> pair = Pair.with("A", 12);
+        // Pair via constructor
+        Pair<String, Integer> person = new Pair<String, Integer>("A", 12);
+        // Quartet from collections
+        List<String> listOf4Names = Arrays.asList("A1","A2","A3","A4");
+        Quartet<String, String, String, String> quartet = Quartet.fromCollection(listOf4Names);
+        // triplet
+        Triplet<String, String, String> triplet = Triplet.with("Java", "C", "C++");
+    }
+}
+```
+
+### Sets
+#### Python
+```python
+set_of_words1: Set[str] = {"A", "B", "C"}
+
+# example2
+set_of_words2: Set[str] = set()
+set_of_words2.add("A")
+set_of_words2.add("B")
+set_of_words2.add("C")
+element_is_in_set: bool = ("Boat" in set_of_words2)  # True
+print(set_of_words2.intersection(set_of_words1))  # intersection
+print(set_of_words2.union(set_of_words1))  # union
+```
+#### Java
+
+### Maps and dictionaries
+#### Python
+```python
+phonebook: Dict[str, str] = {}
+phonebook = {"Slawek": "122-99981", "Mark": "333-1111", "cAdam": "1222-112213"}
+print(phonebook["Slawek"])  # value of a key
+phonebook.keys()  # List of keys
+phonebook.values()  # List of values
+element_is_in_dict = "Slawek" in phonebook  # True
+(phonebook.items())  # prints tuples of key-value pairs
+```
+
+#### Java
+```java
+public class Main {
+    public static void main(String[] args) {
+        HashMap<String, String> phoneBook = new HashMap<String, String>();
+        phoneBook.put("Slawek", "111-1111");
+        phoneBook.put("Lucy", "5255-2222");
+        phoneBook.put("Mark", "51155-3333");
+        
+        //looping elements
+        Map<String, String> map = new HashMap<String, String>();
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+         System.out.println("Key = " + entry.getKey() +
+           ", Value = " + entry.getValue());
+        }
+        
+        //get key value
+        phoneBook.get("Slawek");
+        
+        //get all key
+        Set keys = phoneBook.keySet();
+        
+        //get number of elements
+        phoneBook.size();
+        
+        //delete all elements
+        phoneBook.clear();
+        
+        //delete an element
+        phoneBook.remove("Slawek");    
+    }
+}
+```
+
+
+### List comprehension
 
 #### Python
 ```python
@@ -65,7 +277,593 @@ public class Main {
 
 
 
-## Object encapsulation
+
+
+
+
+
+## General programming
+
+### Method signatures & type hints
+
+#### Python
+
+Example 1
+```python
+from typing import *
+
+# function wirh some positional params
+def test_function(x: int, y: int, w: int = 0, h: int = 0) -> None:
+    print("x: %s, y: %s, w: %s, h: %s" % (x, y, w, h))
+
+
+# normal function call
+test_function(1, 2, 3, 4);
+# x: 1, y: 2, w: 3, h: 4
+
+# arguments unpacking function call
+arg_tuple: Tuple[int] = (1, 2)
+arg_dictionary: Dict[str, int] = {'w': 20, 'h': 10}
+
+test_function(*arg_tuple, **arg_dictionary)
+
+# x: 1, y: 2, w: 20, h: 10
+```
+
+Example 2
+```python
+
+def test_function2(arg1: List[Any], *args: int, **kwargs: str) -> None:
+    print(arg1)
+
+    for x in args:
+        print("next arg is: " + str(x))
+
+    print(kwargs)
+    print(kwargs.get("this"), kwargs.get("that"))
+
+
+# another call with explicit parameters
+test_function2([1, 2, "three"], 4, 5, 6, this="this v", that="that v")
+# [1, 2, 'three']
+# next arg is: 4 next arg is: 5 next arg is: 6
+# {'this': 'this', 'that': 'that'}
+# this v that v
+
+# arguments unpacking example
+targs: List[int] = [4, 5, 6]
+targsb: Tuple[int] = (4, 5, 6, 6)
+kwargs: Dict[str, str] = {"this": "this v", "that": "that v"}
+test_function2([], *targs, **kwargs)
+test_function2([], *targsb, **kwargs)
+# the same result as in above example
+```
+
+Example 3
+```python
+
+
+def test_function2(arg1: List[Any], *args: int, **kwargs: str) -> None:
+    print(arg1)
+
+    for x in args:
+        print("next arg is: " + str(x))
+
+    print(kwargs)
+    print(kwargs.get("this"), kwargs.get("that"))
+
+
+# another call with explicit parameters
+test_function2([1, 2, "three"], 4, 5, 6, this="this v", that="that v")
+# [1, 2, 'three']
+# next arg is: 4 next arg is: 5 next arg is: 6
+# {'this': 'this', 'that': 'that'}
+# this v that v
+
+# arguments unpacking example
+targs: List[int] = [4, 5, 6]
+targsb: Tuple[int] = (4, 5, 6, 6)
+kwargs: Dict[str, str] = {"this": "this v", "that": "that v"}
+test_function2([], *targs, **kwargs)
+test_function2([], *targsb, **kwargs)
+# the same result as in above example
+```
+
+More examples:
+```python
+# type aliases
+
+T = TypeVar('T', int, float, complex)
+Vector = Iterable[Tuple[T, T]]
+
+
+def inproduct(v: Vector[T]) -> T:
+    return sum(x * y for x, y in v)
+
+
+def dilate(v: Vector[T], scale: T) -> Vector[T]:
+    return ((x * scale, y * scale) for x, y in v)
+
+
+# generics
+
+T = TypeVar('T')  # Declare type variable
+
+
+def first(l: Sequence[T]) -> T:  # Generic function
+    return l[0]
+
+
+# iterable
+
+def zero_all_vars(vars: Iterable[LoggedVar[int]]) -> None:
+    for var in vars:
+        var.set(0)
+
+
+# union types
+
+def handle_employees(e: Union[Employee, Sequence[Employee]]) -> None:
+    if isinstance(e, Employee):
+        e = [e]
+
+```
+
+#### Java
+Example 1
+```java
+@Data
+class CarAnother extends Vehicle {
+
+    /**
+     * doSomething - method with many params of many kinds
+     *
+     * @param a
+     * @param b
+     * @param strObject
+     * @param car
+     * @param vehicles
+     * @param anything
+     */
+    public void doSomething(int a, char b, String strObject, Car car, List<Vehicle> vehicles, Object anything) {
+
+        a += 1;
+        strObject.trim();
+        car.setName("Newname");
+        vehicles.stream().forEach(Vehicle::drive);
+
+    }
+
+    /**
+     * doSomething - method with many params - collections and arrays
+     *
+     * @param vehicles
+     * @param colOfVehicles
+     * @param integers
+     * @param cars
+     */
+    public void doSomething(Set<Vehicle> vehicles, Collection<? extends Vehicle> colOfVehicles, int[] integers, Car[] cars) {}
+
+    /**
+     * doSomethingOnSetsOfVehicles - varargs of sets of vehicles
+     *
+     * @param setsOfVehicles
+     */
+    public void doSomethingOnSetsOfVehicles(Set<Vehicle> ... setsOfVehicles) {
+        for (Set<Vehicle> setv : setsOfVehicles) {
+            System.out.println(setv.toArray());
+        }
+    }
+
+    /**
+     * doSomethingOnManyStrings - varargs with strings
+     *
+     * @param str
+     */
+    public void doSomethingOnManyStrings(String ...str) {
+
+        String res = Arrays.stream(str)
+                .map(String::trim)
+                .collect(Collectors.joining(" "));
+
+        System.out.println(res);
+
+    }
+
+    /**
+     * joinDictionaries - join dictionaries, no matter how many
+     * here we have varargs of maps and filter predicate as a positional parameter
+     *
+     * @param filter
+     * @param dicts
+     */
+    public void joinDictionaries(Predicate<Map<String, Integer>> filter, Map<String, Integer>...dicts) {
+
+        Map<String, Integer> mergedMap = Arrays.stream(dicts).filter(filter)
+
+                .map(Map::entrySet)
+                .flatMap(Collection::stream)
+                .collect(
+                        Collectors.toMap(
+                                Map.Entry::getKey,
+                                Map.Entry::getValue,
+                                Integer::max
+                        )
+                );
+
+        System.out.println(mergedMap);
+
+    }
+}
+
+```
+Test
+```java
+public class Main {
+    public static void main(String[] args) {
+
+        CarAnother carAnother = new CarAnother();
+
+        // Example 1 - varargs
+        carAnother.doSomethingOnManyStrings("one", "two", "three", "four"); // one two three four
+
+        // the same function but more params
+        carAnother.doSomethingOnManyStrings("one", "two", "three", "four", "five", "six"); // one two three four five six
+
+
+        // Example 2 - varargs of sets
+        Map<String, Integer> dict1 = new HashMap<String, Integer>() {{
+            put("key1", 1);
+            put("key2", 2);
+        }};
+
+        Map<String, Integer> dict2 = new HashMap<String, Integer>() {{
+            put("key3", 3);
+            put("key4", 4);
+        }};
+
+        Map<String, Integer> dict3 = new HashMap<String, Integer>() {{
+            put("key5", 5);
+        }};
+
+        // run on 2 dictionaries
+        carAnother.joinDictionaries(dict -> dict.size() > 0, dict1, dict2); // {key1=1, key2=2, key3=3, key4=4}
+
+        // run on 3 dictionaries (no matter how many dictionaries we want to use - it will work properly)
+        carAnother.joinDictionaries(dict -> dict.size() > 0, dict1, dict2, dict3); // {key1=1, key2=2, key5=5, key3=3, key4=4}
+
+        List<Vehicle> vehicles = new ArrayList<>();
+        Set<Vehicle> uniqueVehicles = new HashSet<>(vehicles);
+        Car[] cars = new Car[2];
+
+        // run method with mane different params
+        carAnother.doSomething(1, 'x', "str", new Car("",""), vehicles, null);
+
+        // run method with mane different params (collections and arrays)
+        carAnother.doSomething(uniqueVehicles, vehicles, new int[]{1,2,3}, cars);
+
+    }
+}
+```
+
+Simulateing Python's Dictionary parameters.
+
+```java
+@Data
+class CarAnother extends Vehicle {
+
+    /**
+     * doSomethingOnDictParams
+     *
+     * @param normalPositionalParam - normal integer param on first position
+     * @param dict - map/dictionary
+     * @param strParams - vararg (we can put here many strings)
+     */
+    public void doSomethingOnDictParams(int normalPositionalParam, Map<String, String> dict, String ...strParams) {
+
+        String res = Arrays.stream(strParams).collect(Collectors.joining(" "));
+
+        System.out.println(normalPositionalParam);
+        System.out.println(dict);
+        System.out.println(res);
+
+    }
+}
+```
+
+Testing with few dictionary creation approaches.
+
+```java
+public class Main {
+    public static void main(String[] args) {
+
+        CarAnother carAnother = new CarAnother();
+
+        // dict, style 1
+        Map<String, String> myDict = new HashMap<>();
+        myDict.put("key1", "val1");
+        myDict.put("key2", "val2");
+
+        // dict, style 2
+        Map<String, String> myDict2 = Stream.of(new String[][] {
+                { "key1", "val1" },
+                { "key2", "val2" },
+        }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
+
+
+        // dict, style 3
+        Map<String, String> myDict3 = Map.of(
+                "key1", "val1",
+                "key2", "val2"
+        );
+
+        // dict, style 4
+        Map<String, String> myMap = new HashMap<>() {{
+            put("key1", "val1");
+            put("key2", "val2");
+        }};
+
+        // testing
+        carAnother.doSomethingOnDictParams(12, myDict,"a");
+        carAnother.doSomethingOnDictParams(12, myDict2,"a");
+        carAnother.doSomethingOnDictParams(12, myDict3,"a");
+        carAnother.doSomethingOnDictParams(12, myDict, "a", "b", "c");
+        carAnother.doSomethingOnDictParams(12, myDict, "a", "b", "c", "d", "e");
+    }
+}
+```
+
+### Simple file read / write
+#### Python
+```python
+# read line by line
+f = open("/example.txt","r")
+for line in f:
+  print(line)
+f.close()
+
+# read the entire file in memory
+f = open("/example.txt","r")
+contents = f.read()
+print(contents)
+f.close()
+
+# write to a file
+f = open("/example.txt","r+") # open for read and write at the same time
+f.write("test content")
+contents = f.read()
+print(contents) # test content
+
+```
+
+#### Java
+Approach with Buffered input and output stream
+```java
+public class Main {
+    public static void main(String[] args) {
+        String path = "/example.txt";
+
+        // write the content in file 
+        try(BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(path))) {
+            String fileContent = "This is a sample text.";
+            bufferedOutputStream.write(fileContent.getBytes());
+        } catch (IOException e) {
+            // ...
+        }
+
+        // read the content from file
+        try(BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(path))) {
+            int ch = bufferedInputStream.read();
+            while(ch != -1) {
+                System.out.print((char)ch);
+                ch = bufferedInputStream.read();
+            }
+        } catch (FileNotFoundException e) {
+            // ...
+        } catch (IOException e) {
+            // ...
+        }
+    }
+}
+```
+
+Apache Commons FileUtils approach
+```java
+public class Main {
+
+    public static void main(String[] args) throws IOException {
+
+        // READ
+        
+        String path = "/example.txt";
+
+        File myfile = new File(path);
+
+        String contents = FileUtils.readFileToString(myfile, StandardCharsets.UTF_8.name());
+
+        System.out.println(contents);
+
+        List<String> lines = FileUtils.readLines(myfile, StandardCharsets.UTF_8.name());
+            
+        
+        // WRITE
+
+        String string = "Sample text";
+        
+        File myfile = new File(path);
+        
+        FileUtils.writeStringToFile(myfile, string, StandardCharsets.UTF_8.name());
+
+    }
+}
+```
+
+### Basic HTTP client
+#### Python
+```python
+import requests
+r = requests.get("https://google.com/example_data")
+print(r.headers) # headers as a dictionary
+print(r.status_code) # status code
+print(r.content) # body
+r.close()
+```
+
+#### Java
+```java
+public class Main {
+    public static void main(String[] args) {
+
+        OkHttpClient client = new OkHttpClient();
+
+        Request request = new Request.Builder()
+                .url("https://google.com/example_data")
+                .build();
+
+        Response response = null;
+        try {
+            response = client.newCall(request).execute();
+            String responseAsStr = response.body().string();
+            response.code(); // code
+            response.headers(); // Headers
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+	}
+}
+```
+
+### Errors & exceptions handling
+
+#### Python
+```python
+class MyException(Exception):
+    def __init__(self, msg: str) -> None:
+        self.msg = msg
+
+
+class MyError(ValueError):
+    def __init__(self, msg: str) -> None:
+        self.msg = msg
+
+
+try:
+    # do something
+    raise MyException("Bad result")
+
+# catch one of exceptions
+except (ZeroDivisionError, RuntimeError, TypeError):
+    print('One of ZeroDivisionError, RuntimeError, TypeError throwed')
+
+# custome Exception
+except MyException as e:
+    print("MyException: ", e.msg)
+
+# general, another exception
+except:
+    print("any other error")
+
+# continue in this block if there is no any exception catched
+else:
+    print("All good, lets continue")
+
+# finally, always active, no matter if any exception throwed or not
+finally:
+    print("finally")
+
+# MyException:  Bad result
+# finally
+```
+
+#### Java
+
+Example 1:
+
+```java
+
+class MyException extends Exception{
+    MyException(String msg){
+        super(msg);
+    }
+}
+
+class MyError extends Error{
+    MyError(String msg){
+        super(msg);
+    }
+}
+
+public class Main {
+
+    public static void main(String[] args) {
+        
+        try {
+            if(1==1)
+                throw new MyException("My test msg");
+            
+        // catch concrete exception object
+        } catch (MyException e){
+            System.out.println("MyException throwed. Msg: " + e.getMessage());
+
+        // catch one of ArrayIndexOutOfBoundsException | NullPointerException exception
+        } catch (ArithmeticException | NullPointerException e){
+            System.out.println("One of ArrayIndexOutOfBoundsException | NullPointerException throwed");
+
+        // catch any other exception
+        } catch(Exception e) {
+            System.out.println("General exception");
+
+        // run this block always - no matter if any exception trowed or not
+        } finally{
+            System.out.println("finally");
+        }
+
+        // MyException throwed. Msg: My test msg
+        // finally
+
+    }
+    
+    /**
+     * testMethod
+     *
+     * method with possible exception to be handled
+     *
+     * @throws MyException
+     */
+    public void testMethod() throws MyException {
+        if(1==1)
+            throw new MyException("My test msg");
+
+    }
+}
+```
+
+Example 2 (try - catch with resources)
+
+```java
+public class Main {
+
+    public static void main(String[] args) {
+        
+        String path = "/";
+        
+        try(BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(path))) {
+            // ...
+        } catch (IOException e) {e.printStackTrance();}
+        
+    }
+}
+```
+
+* * *
+
+
+
+
+
+## OOP
+
+### Object encapsulation
 
 #### Python
 
@@ -434,459 +1232,6 @@ class CarShort extends Vehicle {
     private String shortname;
     private Integer speed = 100;
 
-}
-```
-
-* * *
-
-## Method signatures & type hints
-
-#### Python
-
-Example 1
-```python
-from typing import *
-
-# function wirh some positional params
-def test_function(x: int, y: int, w: int = 0, h: int = 0) -> None:
-    print("x: %s, y: %s, w: %s, h: %s" % (x, y, w, h))
-
-
-# normal function call
-test_function(1, 2, 3, 4);
-# x: 1, y: 2, w: 3, h: 4
-
-# arguments unpacking function call
-arg_tuple: Tuple[int] = (1, 2)
-arg_dictionary: Dict[str, int] = {'w': 20, 'h': 10}
-
-test_function(*arg_tuple, **arg_dictionary)
-
-# x: 1, y: 2, w: 20, h: 10
-```
-
-Example 2
-```python
-
-def test_function2(arg1: List[Any], *args: int, **kwargs: str) -> None:
-    print(arg1)
-
-    for x in args:
-        print("next arg is: " + str(x))
-
-    print(kwargs)
-    print(kwargs.get("this"), kwargs.get("that"))
-
-
-# another call with explicit parameters
-test_function2([1, 2, "three"], 4, 5, 6, this="this v", that="that v")
-# [1, 2, 'three']
-# next arg is: 4 next arg is: 5 next arg is: 6
-# {'this': 'this', 'that': 'that'}
-# this v that v
-
-# arguments unpacking example
-targs: List[int] = [4, 5, 6]
-targsb: Tuple[int] = (4, 5, 6, 6)
-kwargs: Dict[str, str] = {"this": "this v", "that": "that v"}
-test_function2([], *targs, **kwargs)
-test_function2([], *targsb, **kwargs)
-# the same result as in above example
-```
-
-Example 3
-```python
-
-
-def test_function2(arg1: List[Any], *args: int, **kwargs: str) -> None:
-    print(arg1)
-
-    for x in args:
-        print("next arg is: " + str(x))
-
-    print(kwargs)
-    print(kwargs.get("this"), kwargs.get("that"))
-
-
-# another call with explicit parameters
-test_function2([1, 2, "three"], 4, 5, 6, this="this v", that="that v")
-# [1, 2, 'three']
-# next arg is: 4 next arg is: 5 next arg is: 6
-# {'this': 'this', 'that': 'that'}
-# this v that v
-
-# arguments unpacking example
-targs: List[int] = [4, 5, 6]
-targsb: Tuple[int] = (4, 5, 6, 6)
-kwargs: Dict[str, str] = {"this": "this v", "that": "that v"}
-test_function2([], *targs, **kwargs)
-test_function2([], *targsb, **kwargs)
-# the same result as in above example
-```
-
-More examples:
-```python
-# type aliases
-
-T = TypeVar('T', int, float, complex)
-Vector = Iterable[Tuple[T, T]]
-
-
-def inproduct(v: Vector[T]) -> T:
-    return sum(x * y for x, y in v)
-
-
-def dilate(v: Vector[T], scale: T) -> Vector[T]:
-    return ((x * scale, y * scale) for x, y in v)
-
-
-# generics
-
-T = TypeVar('T')  # Declare type variable
-
-
-def first(l: Sequence[T]) -> T:  # Generic function
-    return l[0]
-
-
-# iterable
-
-def zero_all_vars(vars: Iterable[LoggedVar[int]]) -> None:
-    for var in vars:
-        var.set(0)
-
-
-# union types
-
-def handle_employees(e: Union[Employee, Sequence[Employee]]) -> None:
-    if isinstance(e, Employee):
-        e = [e]
-
-```
-
-#### Java
-Example 1
-```java
-@Data
-class CarAnother extends Vehicle {
-
-    /**
-     * doSomething - method with many params of many kinds
-     *
-     * @param a
-     * @param b
-     * @param strObject
-     * @param car
-     * @param vehicles
-     * @param anything
-     */
-    public void doSomething(int a, char b, String strObject, Car car, List<Vehicle> vehicles, Object anything) {
-
-        a += 1;
-        strObject.trim();
-        car.setName("Newname");
-        vehicles.stream().forEach(Vehicle::drive);
-
-    }
-
-    /**
-     * doSomething - method with many params - collections and arrays
-     *
-     * @param vehicles
-     * @param colOfVehicles
-     * @param integers
-     * @param cars
-     */
-    public void doSomething(Set<Vehicle> vehicles, Collection<? extends Vehicle> colOfVehicles, int[] integers, Car[] cars) {}
-
-    /**
-     * doSomethingOnSetsOfVehicles - varargs of sets of vehicles
-     *
-     * @param setsOfVehicles
-     */
-    public void doSomethingOnSetsOfVehicles(Set<Vehicle> ... setsOfVehicles) {
-        for (Set<Vehicle> setv : setsOfVehicles) {
-            System.out.println(setv.toArray());
-        }
-    }
-
-    /**
-     * doSomethingOnManyStrings - varargs with strings
-     *
-     * @param str
-     */
-    public void doSomethingOnManyStrings(String ...str) {
-
-        String res = Arrays.stream(str)
-                .map(String::trim)
-                .collect(Collectors.joining(" "));
-
-        System.out.println(res);
-
-    }
-
-    /**
-     * joinDictionaries - join dictionaries, no matter how many
-     * here we have varargs of maps and filter predicate as a positional parameter
-     *
-     * @param filter
-     * @param dicts
-     */
-    public void joinDictionaries(Predicate<Map<String, Integer>> filter, Map<String, Integer>...dicts) {
-
-        Map<String, Integer> mergedMap = Arrays.stream(dicts).filter(filter)
-
-                .map(Map::entrySet)
-                .flatMap(Collection::stream)
-                .collect(
-                        Collectors.toMap(
-                                Map.Entry::getKey,
-                                Map.Entry::getValue,
-                                Integer::max
-                        )
-                );
-
-        System.out.println(mergedMap);
-
-    }
-}
-
-```
-Test
-```java
-public class Main {
-    public static void main(String[] args) {
-
-        CarAnother carAnother = new CarAnother();
-
-        // Example 1 - varargs
-        carAnother.doSomethingOnManyStrings("one", "two", "three", "four"); // one two three four
-
-        // the same function but more params
-        carAnother.doSomethingOnManyStrings("one", "two", "three", "four", "five", "six"); // one two three four five six
-
-
-        // Example 2 - varargs of sets
-        Map<String, Integer> dict1 = new HashMap<String, Integer>() {{
-            put("key1", 1);
-            put("key2", 2);
-        }};
-
-        Map<String, Integer> dict2 = new HashMap<String, Integer>() {{
-            put("key3", 3);
-            put("key4", 4);
-        }};
-
-        Map<String, Integer> dict3 = new HashMap<String, Integer>() {{
-            put("key5", 5);
-        }};
-
-        // run on 2 dictionaries
-        carAnother.joinDictionaries(dict -> dict.size() > 0, dict1, dict2); // {key1=1, key2=2, key3=3, key4=4}
-
-        // run on 3 dictionaries (no matter how many dictionaries we want to use - it will work properly)
-        carAnother.joinDictionaries(dict -> dict.size() > 0, dict1, dict2, dict3); // {key1=1, key2=2, key5=5, key3=3, key4=4}
-
-        List<Vehicle> vehicles = new ArrayList<>();
-        Set<Vehicle> uniqueVehicles = new HashSet<>(vehicles);
-        Car[] cars = new Car[2];
-
-        // run method with mane different params
-        carAnother.doSomething(1, 'x', "str", new Car("",""), vehicles, null);
-
-        // run method with mane different params (collections and arrays)
-        carAnother.doSomething(uniqueVehicles, vehicles, new int[]{1,2,3}, cars);
-
-    }
-}
-```
-
-Simulateing Python's Dictionary parameters.
-
-```java
-@Data
-class CarAnother extends Vehicle {
-
-    /**
-     * doSomethingOnDictParams
-     *
-     * @param normalPositionalParam - normal integer param on first position
-     * @param dict - map/dictionary
-     * @param strParams - vararg (we can put here many strings)
-     */
-    public void doSomethingOnDictParams(int normalPositionalParam, Map<String, String> dict, String ...strParams) {
-
-        String res = Arrays.stream(strParams).collect(Collectors.joining(" "));
-
-        System.out.println(normalPositionalParam);
-        System.out.println(dict);
-        System.out.println(res);
-
-    }
-}
-```
-
-Testing with few dictionary creation approaches.
-
-```java
-public class Main {
-    public static void main(String[] args) {
-
-        CarAnother carAnother = new CarAnother();
-
-        // dict, style 1
-        Map<String, String> myDict = new HashMap<>();
-        myDict.put("key1", "val1");
-        myDict.put("key2", "val2");
-
-        // dict, style 2
-        Map<String, String> myDict2 = Stream.of(new String[][] {
-                { "key1", "val1" },
-                { "key2", "val2" },
-        }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
-
-
-        // dict, style 3
-        Map<String, String> myDict3 = Map.of(
-                "key1", "val1",
-                "key2", "val2"
-        );
-
-        // dict, style 4
-        Map<String, String> myMap = new HashMap<>() {{
-            put("key1", "val1");
-            put("key2", "val2");
-        }};
-
-        // testing
-        carAnother.doSomethingOnDictParams(12, myDict,"a");
-        carAnother.doSomethingOnDictParams(12, myDict2,"a");
-        carAnother.doSomethingOnDictParams(12, myDict3,"a");
-        carAnother.doSomethingOnDictParams(12, myDict, "a", "b", "c");
-        carAnother.doSomethingOnDictParams(12, myDict, "a", "b", "c", "d", "e");
-    }
-}
-```
-
-## Errors & exceptions handling
-
-#### Python
-```python
-class MyException(Exception):
-    def __init__(self, msg: str) -> None:
-        self.msg = msg
-
-
-class MyError(ValueError):
-    def __init__(self, msg: str) -> None:
-        self.msg = msg
-
-
-try:
-    # do something
-    raise MyException("Bad result")
-
-# catch one of exceptions
-except (ZeroDivisionError, RuntimeError, TypeError):
-    print('One of ZeroDivisionError, RuntimeError, TypeError throwed')
-
-# custome Exception
-except MyException as e:
-    print("MyException: ", e.msg)
-
-# general, another exception
-except:
-    print("any other error")
-
-# continue in this block if there is no any exception catched
-else:
-    print("All good, lets continue")
-
-# finally, always active, no matter if any exception throwed or not
-finally:
-    print("finally")
-
-# MyException:  Bad result
-# finally
-```
-
-#### Java
-
-Example 1:
-
-```java
-
-class MyException extends Exception{
-    MyException(String msg){
-        super(msg);
-    }
-}
-
-class MyError extends Error{
-    MyError(String msg){
-        super(msg);
-    }
-}
-
-public class Main {
-
-    public static void main(String[] args) {
-        
-        try {
-            if(1==1)
-                throw new MyException("My test msg");
-            
-        // catch concrete exception object
-        } catch (MyException e){
-            System.out.println("MyException throwed. Msg: " + e.getMessage());
-
-        // catch one of ArrayIndexOutOfBoundsException | NullPointerException exception
-        } catch (ArithmeticException | NullPointerException e){
-            System.out.println("One of ArrayIndexOutOfBoundsException | NullPointerException throwed");
-
-        // catch any other exception
-        } catch(Exception e) {
-            System.out.println("General exception");
-
-        // run this block always - no matter if any exception trowed or not
-        } finally{
-            System.out.println("finally");
-        }
-
-        // MyException throwed. Msg: My test msg
-        // finally
-
-    }
-    
-    /**
-     * testMethod
-     *
-     * method with possible exception to be handled
-     *
-     * @throws MyException
-     */
-    public void testMethod() throws MyException {
-        if(1==1)
-            throw new MyException("My test msg");
-
-    }
-}
-```
-
-Example 2 (try - catch with resources)
-
-```java
-public class Main {
-
-    public static void main(String[] args) {
-        
-        String path = "/";
-        
-        try(BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(path))) {
-            // ...
-        } catch (IOException e) {e.printStackTrance();}
-        
-    }
 }
 ```
 
