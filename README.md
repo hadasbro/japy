@@ -2,7 +2,7 @@
 ## Data structures
 
 ### Lists
-#### Python
+##### Python
 ```python
 mlist: List[str] = ["A", "B", "C"]
 mlist.insert(4, "D")  # insert at an index 4
@@ -11,7 +11,7 @@ mlist.remove("C")  # remove first "C" element
 popped: str = mlist.pop(2)  # remove the item at index 2
 mlist.reverse()  # reverse the mlist
 ```
-#### Java
+##### Java
 ```java
 public class Main {
     public static void main(String[] args) {
@@ -30,7 +30,7 @@ public class Main {
 ```
 
 ### Tuples
-#### Python
+##### Python
 ```python
 words: Tuple[str] = ("A", "B")  # or words = "ABng"
 print("A" in words)  # True
@@ -40,7 +40,7 @@ print(a)  # Good
 print(b)  # Morning
 print(len(words))  # 2
 ```
-#### Java
+##### Java
 Tuple is just kind of immutable list. There are many ways how to use immutable collections of any kind e.g. Map, List, Set in Java.
 
 a) Older approach (JDK 5)
@@ -153,7 +153,7 @@ public class Main {
 ```
 
 ### Sets
-#### Python
+##### Python
 ```python
 set_of_words1: Set[str] = {"A", "B", "C"}
 
@@ -166,10 +166,10 @@ element_is_in_set: bool = ("Boat" in set_of_words2)  # True
 print(set_of_words2.intersection(set_of_words1))  # intersection
 print(set_of_words2.union(set_of_words1))  # union
 ```
-#### Java
+##### Java
 
 ### Maps and dictionaries
-#### Python
+##### Python
 ```python
 phonebook: Dict[str, str] = {}
 phonebook = {"Slawek": "122-99981", "Mark": "333-1111", "cAdam": "1222-112213"}
@@ -180,7 +180,7 @@ element_is_in_dict = "Slawek" in phonebook  # True
 (phonebook.items())  # prints tuples of key-value pairs
 ```
 
-#### Java
+##### Java
 ```java
 public class Main {
     public static void main(String[] args) {
@@ -217,7 +217,7 @@ public class Main {
 
 ### List comprehension
 
-#### Python
+##### Python
 ```python
 from typing import *
 
@@ -237,7 +237,7 @@ fruit: List[str] = ["Apples", "Peaches", "Pears", "Bananas"]
 # [(1, 'Peaches'), (1, 'Pears'), (3, 'Peaches'), (3, 'Pears')]
 ```
 
-#### Java
+##### Java
 
 in Java there is not simple equivalent for Python's syntax. 
 We can use Java Streams (Java 8+), additional Java libraries e.g. https://github.com/farolfo/list-comprehensions-in-java
@@ -286,7 +286,7 @@ public class Main {
 
 ### Method signatures & type hints
 
-#### Python
+##### Python
 
 Example 1
 ```python
@@ -409,7 +409,7 @@ def handle_employees(e: Union[Employee, Sequence[Employee]]) -> None:
 
 ```
 
-#### Java
+##### Java
 Example 1
 ```java
 @Data
@@ -614,7 +614,7 @@ public class Main {
 ```
 
 ### Simple file read / write
-#### Python
+##### Python
 ```python
 # read line by line
 f = open("/example.txt","r")
@@ -636,7 +636,7 @@ print(contents) # test content
 
 ```
 
-#### Java
+##### Java
 Approach with Buffered input and output stream
 ```java
 public class Main {
@@ -699,7 +699,7 @@ public class Main {
 ```
 
 ### Basic HTTP client
-#### Python
+##### Python
 ```python
 import requests
 r = requests.get("https://google.com/example_data")
@@ -709,7 +709,7 @@ print(r.content) # body
 r.close()
 ```
 
-#### Java
+##### Java
 ```java
 public class Main {
     public static void main(String[] args) {
@@ -735,7 +735,7 @@ public class Main {
 
 ### Errors & exceptions handling
 
-#### Python
+##### Python
 ```python
 class MyException(Exception):
     def __init__(self, msg: str) -> None:
@@ -775,7 +775,7 @@ finally:
 # finally
 ```
 
-#### Java
+##### Java
 
 Example 1:
 
@@ -865,7 +865,7 @@ public class Main {
 
 ### Object encapsulation
 
-#### Python
+##### Python
 
 ```python
 
@@ -1022,7 +1022,7 @@ print(user.email)  # OK (get Email through descriptor), result: test@mail.com
 
 ```
 
-#### Java
+##### Java
 
 ```java
 interface VehicleInterface {
