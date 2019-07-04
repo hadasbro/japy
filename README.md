@@ -1387,7 +1387,7 @@ print(cls.power(10))  # 10000000000
 ```
 
 ##### Java
-Spring Framework example - approach with Beans and @Qualifier - 
+Spring Framework example - approach with Beans and Qualifier - 
 the same method in 2 different versions (normal and extended), 
 depending on autowired Bean. Extended version log elapsed time of our calulation to the database and returns the same result
 (uses sumNumbers() method from basic version of MathBasic - calculation class)
@@ -1497,7 +1497,7 @@ class TestController extends BaseController {
 }
 ```
 
-Java EE example - approach with @Decorator annotation - method sumNumbers() may behave normally and just calculate sum of integers frm range or, if 
+Java EE example - approach with Decorator annotation - method sumNumbers() may behave normally and just calculate sum of integers frm range or, if 
 we register decorator - we may use extended version of that method with elapsed time logging. Decorated method 
 uses the same logic and returns the same result but log in elapsed time to the DB.
 
