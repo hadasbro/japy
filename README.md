@@ -11,6 +11,7 @@ mlist.remove("C")  # remove first "C" element
 popped: str = mlist.pop(2)  # remove the item at index 2
 mlist.reverse()  # reverse the mlist
 ```
+
 ##### Java
 ```java
 public class Main {
@@ -40,6 +41,7 @@ print(a)  # Good
 print(b)  # Morning
 print(len(words))  # 2
 ```
+
 ##### Java
 Tuple is just kind of immutable list. There are many ways how to use immutable collections of any kind e.g. Map, List, Set in Java.
 
@@ -166,7 +168,28 @@ element_is_in_set: bool = ("Boat" in set_of_words2)  # True
 print(set_of_words2.intersection(set_of_words1))  # intersection
 print(set_of_words2.union(set_of_words1))  # union
 ```
+
 ##### Java
+```java
+public class Main {
+    public static void main(String[] args) {
+        Set<String> set1 = new HashSet<>();
+        Set<String> set2 = new HashSet<>() {{ add("A"); add("B");}};
+        
+        set1.add("A");
+        set1.add("B");
+        set1.add("C");
+         
+        //intersection
+        Set<String> intersect = new HashSet<>(set1);
+        intersect.retainAll(set2);
+        
+        //union
+        Set<String> union = new HashSet<>(set1);
+        union.addAll(set2);
+    }
+}
+```
 
 ### Maps and dictionaries
 ##### Python
@@ -216,7 +239,6 @@ public class Main {
 
 
 ### List comprehension
-
 ##### Python
 ```python
 from typing import *
@@ -283,9 +305,7 @@ public class Main {
 
 
 ## General programming
-
 ### Method signatures & type hints
-
 ##### Python
 
 Example 1
@@ -615,6 +635,7 @@ public class Main {
 
 ### Simple file read / write
 ##### Python
+
 ```python
 # read line by line
 f = open("/example.txt","r")
@@ -1236,3 +1257,336 @@ class CarShort extends Vehicle {
 ```
 
 * * *
+
+## Decorators
+
+### Decorator and monkey patching
+##### Python
+Example 1 - function and method decoration
+```python
+from typing import *
+import time
+import types
+
+RT = Callable[..., Dict[str, Any]]
+BT = Callable[..., int]
+
+
+# PythonDecorators/decorator_function_with_arguments.py
+def decorator_check_duration(precision: int = 5) -> Callable[[BT], RT]:
+    def wrap(f: BT) -> RT:
+        def wrapped_f(**range: int) -> Dict[str, Any]:
+            start: float = time.time()
+            res = f(**range)
+            end: float = time.time()
+            return {"result": res, "time": round(end - start, precision)}
+
+        return wrapped_f
+
+    return wrap
+
+
+# sum numbers function
+def sumNumbers(**rangenum: int) -> int:
+    return sum(x for x in range(rangenum.get('start'), rangenum.get('stop')) if x % 3 == 0)
+
+
+# decorated sum numbers function (do the same but also calculates
+# time taken and returns it as a dictionary with key "time")
+@decorator_check_duration(2)
+def sumNumbersWithTimeChecking(**rangenum: int) -> Any:
+    return sumNumbers(**rangenum)
+
+
+def sumNumbersNormally(**rangenum: int) -> int:
+    return sumNumbers(**rangenum)
+
+
+# normal sum
+print(sumNumbersNormally(start=1, stop=10000000))  # 16666668333333
+
+# the same function but decorated by decorator (duration checker)
+print(sumNumbersWithTimeChecking(start=1, stop=10000000))  # {'result': 16666668333333, 'time': 1.39}
+
+```
+
+Example 2 - Logger decorator (logging function's input/output to the DB)
+
+```python
+
+class decorator_logger():
+
+    def __init__(self, logger: Callable[[Dict[str, str]], None]) -> None:
+        """
+        register logger
+        """
+        if callable(logger):
+            self.logger = logger
+        else:
+            self.logger = None
+
+    def __call__(self, f) -> Callable[..., int]:
+        """
+        If there are decorator arguments, __call__() is only called
+        once, as part of the decoration process! You can only give
+        it a single argument, which is the function object.
+        """
+
+        def wrapped_f(**rangenum: int) -> int:
+            res = f(**rangenum)
+
+            if self.logger:
+                self.logger({"input": rangenum, "output": res})
+
+            return res
+
+        return wrapped_f
+
+
+# create callable logger
+myLogger: Callable[[Dict[str, str]], None] = lambda x: print("Log to database: ", x)
+
+
+# decorate function by logger, so capture and log input and output
+@decorator_logger(myLogger)
+def calculateSumB(**rangenum: int):
+    return sum(x for x in range(rangenum.get('start'), rangenum.get('stop')) if x % 3 == 0)
+
+
+print(calculateSumB(start=1, stop=10000000))
+
+
+# returned result: 16666668333333
+# additionally method uses callable logger so below line is printed as well
+# Log to database:  {'input': {'start': 1, 'stop': 10000000}, 'output': 16666668333333}
+
+```
+
+Example 3 - Monkey Patching
+```python
+class Class():
+
+    def power(self, x: int, y: int = 2) -> int:
+        return x ** y
+
+    def set_power_mode_x_by_x(self) -> None:
+        opower = self.power
+
+        def power_x_by_x(self, x: int) -> int:
+            return opower(x, x)
+
+        self.power = types.MethodType(power_x_by_x, self)
+
+
+cls = Class()
+print(cls.power(10))  # 100
+
+cls.set_power_mode_x_by_x()
+print(cls.power(10))  # 10000000000
+
+```
+
+##### Java
+Spring Framework example - approach with Beans and @Qualifier - 
+the same method in 2 different versions (normal and extended), 
+depending on autowired Bean. Extended version log elapsed time of our calulation to the database and returns the same result
+(uses sumNumbers() method from basic version of MathBasic - calculation class)
+
+```java
+
+interface Calculations{
+    int sumNumbers(Range<Integer> range);
+}
+
+/**
+ * Basic calc class
+ */
+class MathBasic implements Calculations {
+
+    /**
+     * sumNumbers
+     * @param range
+     * @return int
+     */
+    public int sumNumbers(Range<Integer> range){
+
+        return IntStream.range(
+                range.lowerEndpoint(),
+                range.upperEndpoint()
+        ).sum();
+
+    }
+
+}
+
+/**
+ * class with elapsed time
+ * check on every method
+ */
+class MathWithTimer implements Calculations {
+
+    /**
+     * sumNumbers with logging elapsed time to the DB
+     *
+     * @param range
+     * @return Map<String, Number>
+     */
+    public int sumNumbers(Range<Integer> range){
+
+        long lStartTime = System.currentTimeMillis();
+
+        MathBasic mb = new MathBasic();
+
+        int result = mb.sumNumbers(range);
+        
+        long elapsedTime = System.currentTimeMillis() - lStartTime;
+
+        // log elapsed time [ elapsedTime ] to DB ...
+
+        return result;
+
+    }
+
+}
+
+@Configuration
+class MainConfig {
+
+    @Primary
+    @Bean(name = "MathBasic")
+    public Calculations calculations() {
+        return new MathBasic();
+    }
+
+    @Bean(name = "MathWithTimer")
+    public Calculations calculationsWithTimer() {
+        return new MathWithTimer();
+    }
+}
+
+
+@RestController
+class TestController extends BaseController {
+
+    /**
+     * normal calculator
+     * standard method sumNumbers()
+     */
+    @Autowired
+    private Calculations calculator;
+
+    /**
+     * extended calculator with timer - basic calculator decorated 
+     * by elapsed time logger
+     */
+    @Autowired
+    @Qualifier( "MathWithTimer")
+    private Calculations calculatorExtended;
+
+
+    @RequestMapping(value = "/sum", method = RequestMethod.GET)
+    public void getSum(){
+        int res = calculator.sumNumbers(Range.open(1,100000));
+    }
+
+    @RequestMapping(value = "/sum-extended", method = RequestMethod.GET)
+    public void getSumExtended(){
+        int res = calculatorExtended.sumNumbers(Range.open(1,100000));
+    }
+
+}
+```
+
+Java EE example - approach with @Decorator annotation - method sumNumbers() may behave normally and just calculate sum of integers frm range or, if 
+we register decorator - we may use extended version of that method with elapsed time logging. Decorated method 
+uses the same logic and returns the same result but log in elapsed time to the DB.
+
+```java
+package mypackage;
+
+import com.google.common.collect.Range;
+import java.util.stream.IntStream;
+import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.decorator.Decorator;
+import javax.decorator.Delegate;
+import javax.enterprise.inject.Any;
+
+interface Calculations{
+    int sumNumbers(Range<Integer> range);
+}
+
+@Decorator
+abstract class CalculatorDecorator implements Calculations {
+
+    @Inject
+    @Delegate
+    @Any
+    private Calculations calculator;
+
+    public int sumNumbers(Range<Integer> range) {
+
+        long lStartTime = System.currentTimeMillis();
+
+        int res = calculator.sumNumbers(range);
+
+        long elapsedTime = System.currentTimeMillis() - lStartTime;
+
+        // log elapsed time [ elapsedTime ] to DB ...
+
+        return res;
+    }
+}
+
+
+class BasicCalculator implements Calculations {
+
+    @Override
+    public int sumNumbers(Range<Integer> range) {
+        int sumOfRange = IntStream.range(
+                range.lowerEndpoint(),
+                range.upperEndpoint()
+        ).sum();
+
+        return sumOfRange;
+    }
+}
+
+
+@Path("/")
+class TestController {
+
+    @Inject
+    private Calculations calculator;
+
+    @GET
+    @Path("/")
+    public void testSum() {
+        int res = calculator.sumNumbers(Range.open(1,100000));
+    }
+
+}
+```
+
+Add decorator in beans.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://java.sun.com/xml/ns/javaee"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/beans_1_0.xsd">
+    <decorators>
+        <class>mypackage.CalculatorDecorator</class>
+    </decorators>
+</beans>
+```
+
+Another example of Decorator Design Pattern in Java - see https://bitbucket.org/slawekhaa/design-patterns-java-examples/wiki/Home
+
+##### Other, related concepts in Java
+Custom annotations is very powerful mechanism in Java. We may use it to 
+create decorators by many ways e.g. we can track and modify or log method's I/O or extend methods and classes functionality and do 
+many various things with it.
+
+Example of custom annotations - registering buttons Event handlers
