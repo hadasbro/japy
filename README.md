@@ -1803,7 +1803,7 @@ Test.test_polymorphism_on_class_methods((db_repo, file_repo), "test")
 
 ```
 
-##### java
+##### Java
 Example of polymorphism.
 
 ```java
