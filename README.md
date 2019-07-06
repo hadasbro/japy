@@ -1387,6 +1387,257 @@ print(cls.power(10))  # 10000000000
 ```
 
 ##### Java
+
+AOP/AspectJ approach. Aspect-Oriented Programming (AOP) complements Object-Oriented Programming (OOP) by providing another way of thinking about program structure. The key unit of modularity in OOP is the class, whereas in AOP the unit of modularity is the aspect. 
+
+Simple Logger by decorator example:
+
+```java 
+package jlogger;
+
+import lombok.extern.java.Log;
+import org.apache.commons.lang3.StringUtils;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.reflect.MethodSignature;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.function.Predicate;
+
+
+/* --- interfaces --- */
+
+interface LoggableRequest {String toString();}
+
+interface LoggableResponse {String toString();}
+
+interface LoggerHandler {
+    void init();
+    void end();
+    <S extends LoggableRequest> void logRequest(S request);
+    <T extends LoggableResponse> void logResponse(T response);
+}
+
+/**
+ * Main Logger interface - kind of Decorator
+ */
+@Retention(
+        RetentionPolicy.RUNTIME
+)
+@Target({
+        ElementType.CONSTRUCTOR,
+        ElementType.METHOD
+})
+//public
+@interface Logger {
+    enum TYPE{
+        ALL,
+        REQUEST,
+        RESPONSE
+    }
+    TYPE[] logTypes() default {TYPE.ALL};
+    Class<? extends LoggerHandler> loggerHandler() default DefaultLogger.class;
+
+}
+
+@Log
+class DefaultLogger implements LoggerHandler {
+
+    private static String JOIN_SEPARATOR = " | ";
+
+    private StringBuilder logResult = new StringBuilder();
+
+    @Override
+    public void init() {
+    }
+
+    @Override
+    public void end() {
+        log.info(StringUtils.strip(logResult.toString(), JOIN_SEPARATOR));
+    }
+
+    @Override
+    public void logRequest(LoggableRequest request) {
+        logResult.append(" request: ").append(request).append(JOIN_SEPARATOR);
+    }
+
+    @Override
+    public void logResponse(LoggableResponse response) {
+        logResult.append(" response: ").append(response).append(" | ");
+    }
+
+}
+
+/**
+ * Aspect J, class with pointcuts
+ */
+@Log
+@Aspect
+class AspectLogger {
+
+    @Pointcut(
+            "execution(* *(..)) && @annotation(Logger)"
+    )
+    public void loggerLog() {}
+
+    @Around("loggerLog()")
+    public Object around(ProceedingJoinPoint point) {
+
+        LoggerHandler loggerHandlerInstance = null;
+
+        Method method = ((MethodSignature) point.getSignature()).getMethod();
+
+        Logger logParams = method.getAnnotation(Logger.class);
+
+        Class<? extends LoggerHandler> loggerHandler = logParams.loggerHandler();
+
+        try {
+            loggerHandlerInstance = loggerHandler.getDeclaredConstructor().newInstance();
+        } catch (
+                InstantiationException
+                        | IllegalAccessException
+                        | InvocationTargetException
+                        | NoSuchMethodException e
+        ) {
+            log.warning(e.toString());
+        }
+
+
+        /*
+            ----- parse RESPONSE -----
+         */
+        Object jpObj = null;
+
+        /* LoggableResponse */
+        LoggableResponse response = null;
+
+        try {
+
+            jpObj = point.proceed();
+
+            if(jpObj instanceof LoggableResponse){
+                response = (LoggableResponse) jpObj;
+            }
+
+            Class responseEntityClazz = null;
+
+            if(responseEntityClazz.isInstance(jpObj)) {
+
+                Method getBodyMethod = responseEntityClazz.getMethod("getBody");
+
+                Object reqBody = getBodyMethod.invoke(jpObj);
+
+                if(reqBody instanceof LoggableResponse) {
+                    response = (LoggableResponse) reqBody;
+                }
+
+            }
+
+        } catch (Throwable throwable) {
+            log.warning(throwable.toString());
+        }
+
+
+        /*
+            ----- parse REQUEST -----
+         */
+        LoggableRequest request = null;
+
+        try {
+
+            /* LoggableRequest */
+            request = Arrays
+                    .stream(
+                            point.getArgs()
+                    )
+                    .filter(
+                            obj -> obj instanceof LoggableRequest
+                    )
+                    .map(
+                            obj -> (LoggableRequest) obj
+                    )
+                    .findFirst()
+                    .orElse(null);
+
+        } catch (Throwable throwable) {
+            log.warning(throwable.toString());
+        }
+
+        // log only when Rqeuset containg value ...
+
+
+        String requiredRequestField;
+
+        String requiredRequestValue;
+
+
+        // get log types, log only request, response, both of them, etc.
+
+        Logger.TYPE[] logTypes = logParams.logTypes();
+
+        Predicate<Logger.TYPE> logAll = el -> el.equals(Logger.TYPE.ALL);
+        Predicate<Logger.TYPE> logRequest = el -> el.equals(Logger.TYPE.REQUEST);
+        Predicate<Logger.TYPE> logResponse = el -> el.equals(Logger.TYPE.RESPONSE);
+
+        if(loggerHandlerInstance == null) {
+            return jpObj;
+        } else{
+            loggerHandlerInstance.init();
+        }
+
+        // log request
+        if(Arrays.stream(logTypes).anyMatch(logAll.or(logRequest)) && request != null){
+            loggerHandlerInstance.logRequest(request);
+        }
+
+        // log response
+        if(Arrays.stream(logTypes).anyMatch(logAll.or(logResponse)) && response != null){
+            loggerHandlerInstance.logResponse(response);
+        }
+
+        loggerHandlerInstance.end();
+
+        return jpObj;
+
+    }
+
+}
+
+
+/**
+ * Test
+ */
+class MyController{
+
+    /**
+     * example with parameters
+     */
+    @Logger(logTypes = {Logger.TYPE.REQUEST, Logger.TYPE.RESPONSE}, loggerHandler=DefaultLogger.class)
+    public void method(){}
+
+    /**
+     * simple decoration, without any paramters
+     */
+    @Logger
+    public void anotherMethod(){}
+}
+
+
+
+```
+
+See more: https://bitbucket.org/slawekhaa/jlogger-java-aspectj/src
+
+
+
 Spring Framework example - approach with Beans and Qualifier - 
 the same method in 2 different versions (normal and extended), 
 depending on autowired Bean. Extended version log elapsed time of our calulation to the database and returns the same result
@@ -1589,4 +1840,191 @@ Custom annotations is very powerful mechanism in Java. We may use it to
 create decorators by many ways e.g. we can track and modify or log method's I/O or extend methods and classes functionality and do 
 many various things with it.
 
-Example of custom annotations - registering buttons Event handlers
+Example of custom annotations - registering buttons Event handlers.
+
+```java
+import javax.swing.*;
+import java.awt.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+
+
+// --------------------- custom annotation - decorator ---------------------
+
+
+/**
+ * Custom annotation - action listener decorator
+ */
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+/*public*/ @interface RegisterActionListener
+{
+    String value() default "";
+    String[] values() default {};
+    Class<? extends CustomHandler> handlerClass() default DefaultHandler.class;
+}
+
+
+// --------------------- custom handler - example of decorator's parameter ---------------------
+
+/**
+ * Custom habdler interface
+ */
+interface CustomHandler{
+    void handle(Object element);
+}
+
+class DefaultHandler implements CustomHandler{
+    @Override
+    public void handle(Object element) {}
+}
+
+/**
+ * my custom handler example
+ */
+class MyHandler implements CustomHandler{
+    @Override
+    public void handle(Object element) {
+        System.out.println("handle");
+    }
+}
+
+
+
+// --------------------- action processor, based on reflection  ---------------------
+
+/*public*/ class ActionListenerInstaller
+{
+    /**
+     * processAnnotations - annotation processor
+     * @param obj
+     */
+    public static void processAnnotations(Object obj)
+    {
+        try
+        {
+            Class<?> cl = obj.getClass();
+
+
+            for (Method m : cl.getDeclaredMethods())
+            {
+                RegisterActionListener a = m.getAnnotation(RegisterActionListener.class);
+                Class<? extends CustomHandler> handler = a.handlerClass();
+
+                if (a != null)
+                {
+                    if(a.values().length > 0) {
+                        for (String v : a.values()) {
+                            Field f = setFieldAccessible(cl, v);
+                            addListener(f.get(obj), obj, m, handler);
+                        }
+                    }
+                    if(!a.value().isEmpty()) {
+                        for (String v : a.values()) {
+                            Field f = setFieldAccessible(cl, v);
+                            addListener(f.get(obj), obj, m, handler);
+                        }
+                    }
+
+                }
+            }
+
+
+
+        } catch (Exception e) {}
+    }
+
+    private static Field setFieldAccessible(Class<?> cl, String fieldName) throws NoSuchFieldException {
+        Field f = cl.getDeclaredField(fieldName);
+        f.setAccessible(true);
+        return f;
+    }
+    /**
+     * Add listener to source element
+     *
+     * @param source
+     * @param param
+     * @param m
+     * @throws Exception
+     */
+    public static void addListener(Object source, final Object param, final Method m, Class<? extends CustomHandler> customHandler)
+            throws ReflectiveOperationException
+    {
+        InvocationHandler handler = (proxy, mm, args) -> m.invoke(param);
+
+        Object listener = Proxy.newProxyInstance(null, new Class[] { java.awt.event.ActionListener.class }, handler);
+        Method adder = source.getClass().getMethod("addActionListener", java.awt.event.ActionListener.class);
+        adder.invoke(source, listener);
+
+        // use custom handler to handle action if any
+        if(customHandler != DefaultHandler.class) {
+            Method method = customHandler.getMethod("handle", String.class);
+            Object o = method.invoke(source);
+        }
+    }
+}
+
+
+
+// --------------------- decorator's/annotation's @RegisterActionListener usage   ---------------------
+
+/**
+ * Example of usage - class with 2 buttons and
+ * 2 action handlers registered by annotation/decorator
+ */
+/*public*/ class MyButtonsFrame extends JFrame
+{
+
+    private JPanel panel;
+    private JButton buttonA;
+    private JButton buttonB;
+
+    public MyButtonsFrame()
+    {
+
+        panel = new JPanel();
+        add(panel);
+
+        buttonA = new JButton("My button A");
+        buttonB = new JButton("My button B");
+
+        panel.add(buttonA);
+        panel.add(buttonB);
+
+        ActionListenerInstaller.processAnnotations(this);
+    }
+
+    /**
+     * register this action to be called on buttonA click
+     */
+    @RegisterActionListener("buttonA")
+    public void yellowBackground()
+    {
+        panel.setBackground(Color.YELLOW);
+    }
+
+    /**
+     * register action on 2 buttons
+     */
+    @RegisterActionListener(values = {"buttonB", "buttonA"})
+    public void blueBackground()
+    {
+        panel.setBackground(Color.BLUE);
+    }
+
+    /**
+     * register action with custom handler class
+     */
+    @RegisterActionListener(values = {"buttonB", "buttonA"}, handlerClass = MyHandler.class)
+    public void redBackground()
+    {
+        panel.setBackground(Color.RED);
+    }
+}
+```
