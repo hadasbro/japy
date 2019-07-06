@@ -294,6 +294,41 @@ public class Main {
 }
 ```
 
+### Popular data structures
+
+##### Python
+
+Python Data Structures - https://docs.python.org/3/tutorial/datastructures.html
+
+##### Java 
+
+Collection interface - https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Collection.html
+
+Set - https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Set.html
+
+List - https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html
+
+Map - https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html
+
+SortedSet - https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/SortedSet.html
+
+SortedMap - https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/SortedMap.html
+
+HashSet - https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/HashSet.html
+
+TreeSet - https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/TreeSet.html
+
+ArrayList - https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/ArrayList.html
+
+LinkedList - https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/LinkedList.html  
+
+Vector - https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Vector.html
+
+Collections - https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Collections.html
+
+AbstractCollection - https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/AbstractCollection.html
+
+
 
 * * *
 
@@ -1255,6 +1290,572 @@ class CarShort extends Vehicle {
 
 }
 ```
+
+### Inner classes
+
+##### Python
+```python
+class Outer:
+    """Outer Class"""
+
+    def __init__(self):
+        # instantiating the 'Inner' class
+        self.inner = self.Inner()
+
+    def reveal(self):
+        # calling the 'Inner' class function inner_method
+        self.inner.inner_method("Call inner_method")
+
+    class Inner:
+        """Inner Class"""
+
+        def inner_method(self, msg):
+            print(msg)
+
+    class InnerAnother:
+        """Inner Class"""
+
+        def another_inner_method(self, msg):
+            print(msg)
+
+
+# Access to inner class
+Outer().Inner().inner_method("Calling inner_method from Inner class")
+
+# Another example - instantiating InnerAnother class
+outer = Outer()
+inner = outer.InnerAnother()
+inner.another_inner_method("Done!")
+```
+##### Java
+```java
+/**
+ * Outer and inner class
+ */
+class Outer {
+
+    /**
+     * inner class
+     */
+    private class Inner {
+        public void print() {
+            System.out.println("Inner class");
+        }
+    }
+
+    /**
+     * Accessing class inner inside method
+     */
+    void doSomething() {
+        Inner inner = new Inner();
+        inner.print();
+    }
+
+    void testLocalInnerClass()
+    {
+        /**
+         * method-local inner class
+         */
+        class LoalInner {
+            public void print() {
+                System.out.println("Local inner class");
+            }
+        }
+
+        LoalInner inner = new LoalInner();
+        inner.print();
+    }
+}
+
+/**
+ * Example of interface as a base for Anonymous inner class
+ */
+interface MyInterface {
+    public abstract void doSomething();
+}
+
+/*public*/
+class Test {
+
+    public static void main(String args[]) {
+        // Instantiating the outer class
+        Outer outer = new Outer();
+
+        // Accessing the doSomething() method.
+        outer.doSomething();
+
+        // test local inner class
+        outer.testLocalInnerClass();
+
+        /*
+         Example of anonymous inner class based on interface
+         */
+        MyInterface obj = new MyInterface() {
+            @Override
+            public void doSomething() {
+                System.out.println("Anonybous inner class");
+            }
+        };
+
+        /*
+         The same example as above - Lambda expression approach
+         */
+        MyInterface obj2 = () -> System.out.println("Anonybous inner class");
+
+
+        /*
+        annonymous inner class' object as a parameter of method
+         */
+        testAnonymous(() -> System.out.println("Anonybous inner class"));
+
+    }
+
+    protected static void testAnonymous(MyInterface obj){
+        obj.doSomething();
+    }
+}
+```
+
+
+### Multiple inheritance
+
+##### Python
+
+Multiple inheritance example:
+
+```python
+class MathA:
+    def add(self, a, b):
+        return a + b;
+
+
+class MathB:
+    def multiply(self, a, b):
+        return a * b;
+
+
+class MathC:
+    def power(self, a, b):
+        return a ** b;
+
+
+class Calculation(MathA, MathB, MathC):
+    def divide(self, a, b):
+        return a / b;
+
+
+d = Calculation()
+print(d.add(10, 30))
+print(d.multiply(10, 30))
+print(d.divide(20, 50))
+print(d.power(2, 4))
+
+
+# 40
+# 300
+# 0.4
+# 16
+
+```
+
+Resolving "Diamond problem":
+```python
+class MathAD:
+    def calculate(self, a, b):
+        print("do sum")
+        return a + b
+
+
+class MathBD:
+    def calculate(self, a, b):
+        print("do multiply")
+        return a * b
+
+
+class MathCD:
+    def calculate(self, a, b):
+        print("do power")
+        return a ** b
+
+
+class Calculation(MathAD, MathBD, MathCD):
+    def calculate(self, a, b):
+        result = MathAD.calculate(self, a, b), MathBD.calculate(self, a, b), MathCD.calculate(self, a, b)
+        print("job done")
+        return result
+
+
+calc = Calculation()
+res = calc.calculate(2, 3)
+print(res)
+# do sum
+# do multiply
+# do power
+# job done
+# (5, 6, 8)
+```
+##### Java
+
+Multiple inheritance and solving Diamond Problem based on Interface's default method.
+
+```java
+import java.util.HashMap;
+import java.util.Map;
+
+interface MathAD{
+    default int sum(int a, int b){
+        System.out.println("do sum");
+        return a + b;
+    }
+
+    default int calculate(int a, int b){
+        System.out.println("do sum as a calculation");
+        return sum(a, b);
+    }
+}
+
+
+interface MathBD{
+    default int multiply(int a, int b){
+        System.out.println("do multiply");
+        return a * b;
+    }
+
+    default int calculate(int a, int b){
+        System.out.println("do multiply as a calculation");
+        return this.multiply(a, b);
+    }
+}
+
+interface MathCD{
+    default int power(int a, int b){
+        System.out.println("do power");
+        return (int) Math.pow(a, b);
+    }
+
+    default int calculate(int a, int b){
+        System.out.println("do power as a calculation");
+        return this.power(a, b);
+    }
+}
+
+
+/*public*/
+class Calculation implements MathAD, MathBD, MathCD {
+
+    public Map<String, Integer> testCalculate(int a, int b) {
+
+        Map<String, Integer> res = new HashMap<>();
+        res.put(MathAD.class.getName(), MathAD.super.calculate(a, b));
+        res.put(MathBD.class.getName(), MathBD.super.calculate(a, b));
+        res.put(MathCD.class.getName(), MathCD.super.calculate(a, b));
+
+        System.out.println(res);
+
+        return res;
+    }
+
+    @Override
+    public int calculate(int a, int b) {
+        int res = MathBD.super.calculate(a, b);
+        System.out.println(res);
+        return res;
+    }
+
+}
+
+
+
+
+public class Main {
+    public static void main(String[] args) {
+
+        Calculation calc = new Calculation();
+        calc.calculate(2,3);
+        calc.testCalculate(3,4);
+
+//        do multiply as a calculation
+//        do multiply
+//        6
+//        do sum as a calculation
+//        do sum
+//        do multiply as a calculation
+//        do multiply
+//        do power as a calculation
+//        do power
+//        {MathBD=12, MathAD=7, MathCD=81}
+
+
+    }
+}
+```
+
+### Singleton patterns
+
+##### Python
+
+Approach with __new__ method.
+
+```python
+class Logger():
+    def __new__(cls, *args, **kwds):
+        it = cls.__dict__.get("__it__")
+        if it is not None:
+            return it
+        cls.__it__ = it = object.__new__(cls)
+        it.init(*args, **kwds)
+        return it
+
+    def init(self, *args, **kwds):
+        pass
+
+    def log(self, msg):
+        pass
+    
+logger = Logger()
+logger.log("abc")
+
+another_logger = Logger()
+another_logger.log("abc")
+
+print(id(logger))
+print(id(another_logger))
+
+# 23358832
+# 23358832
+
+```
+
+Metaclass approach
+
+```python
+class Singleton(type):
+    _instances = {}
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+class Logger(metaclass=Singleton):
+    __metaclass__ = Singleton
+
+    def __init__(self, start_point=0):
+        self.start_point = start_point;
+
+    def log(txt):
+        print("log", txt, 0)
+
+class DifferentLogger(metaclass=Singleton):
+    __metaclass__ = Singleton
+
+
+
+a = Logger(1)
+b = Logger(2)
+c = DifferentLogger()
+d = DifferentLogger()
+print(a is b) # True
+print((a is c) or (a is d)) # FALSE
+print(c is d) # True
+
+# True
+# False
+# True
+```
+
+Singleton via decorator approach
+```python
+def singleton(cls):
+    instances = {}
+    def getinstance():
+        if cls not in instances:
+            instances[cls] = cls()
+        return instances[cls]
+    return getinstance
+
+@singleton
+class Logger:
+    def log(self, txt):
+        print("log", txt, 0)
+
+@singleton
+class AnotherLogger:
+    def log(self, txt):
+        print("another log", txt, 0)
+
+logger = Logger()
+another_logger = Logger()
+another_different_logger = AnotherLogger()
+another_different_logger_two = AnotherLogger()
+
+print(logger is another_logger)
+logger.log("abc")
+another_logger.log("def")
+another_different_logger.log("a")
+another_different_logger_two.log("b")
+print(logger is another_different_logger)
+print(another_different_logger is another_different_logger_two)
+
+# True
+# log abc 0
+# log def 0
+# another log a 0
+# another log b 0
+# False
+# True
+
+```
+
+##### Java
+```java
+class Logger {
+
+    // private constructor to block typical instantiation via new Logger()
+    private Logger() {}
+
+    public static Logger getInstance() {
+        return SingletonHolder.INSTANCE;
+    }
+
+    // any method
+    public void log() {}
+
+    /*
+        private, static, final inner class - will be available in outer class at all time
+        this class will be loaded only if method Logger.getInstance will be called
+        and then SingletonHolder.INSTANCE will instantiate Logger object
+    */
+    private static class SingletonHolder {
+        private static final Logger INSTANCE = new Logger();
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+
+        /* usage example */
+        Logger.getInstance().log();
+    }
+}
+
+```
+
+
+### Polymorphism example
+
+##### Python
+
+Polymorphism on class and method level example (implementation with ABC - Abstract Base Classes)
+
+
+```python
+import abc
+from typing import Type, Tuple
+
+
+# Interface Repository
+class Repository(abc.ABC):
+    @abc.abstractmethod
+    def save_data(self) -> None:
+        pass
+
+# DB_Repository
+class DB_Repository(Repository):
+    def __init__(self):
+        pass
+
+    def save_data(self, data: str) -> None:
+        print("Save data to DB_Repository", " ", data)
+
+
+# File_Repository
+class File_Repository(Repository):
+    def __init__(self):
+        pass
+
+    def save_data(self, data: str) -> None:
+        print("Save data to File_Repository", " ", data)
+
+
+class Test():
+    @staticmethod
+    def save_data_to_repository(obj: Type[Repository], data: str) -> Repository:
+        obj.save_data(data)
+
+    @staticmethod
+    def test_polymorphism_on_class_methods(repos: Tuple[Repository], data: str) -> None:
+        for repo in repos:
+            repo.save_data(data)
+
+
+db_repo:DB_Repository = DB_Repository();
+file_repo:File_Repository = File_Repository();
+
+Test.save_data_to_repository(db_repo, "Data example 1")
+Test.save_data_to_repository(file_repo, "Data example 2")
+
+# Save data to DB_Repository   Data example 1
+# Save data to File_Repository   Data example 2
+
+Test.test_polymorphism_on_class_methods((db_repo, file_repo), "test")
+# Save data to DB_Repository   test
+# Save data to File_Repository   test
+
+```
+
+##### java
+Example of polymorphism.
+
+```java
+
+import java.util.Arrays;
+
+interface Repository{void save_data(String data);}
+
+class DB_Repository implements Repository{
+    @Override
+    public void save_data(String data) {
+        System.out.println("Save data to DB_Repository " + data);
+    }
+}
+
+class File_Repository implements Repository{
+    @Override
+    public void save_data(String data) {
+        System.out.println("Save data to File_Repository " + data);
+    }
+}
+
+
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Repository dbRepo = new DB_Repository();
+        Repository fileRepo = new File_Repository();
+
+        dbRepo.save_data("data 1");
+        fileRepo.save_data("data 2");
+        
+        testMethods(dbRepo, fileRepo);
+
+        // Save data to DB_Repository data 1
+        // Save data to File_Repository data 2
+        // Save data to DB_Repository test data
+        // Save data to File_Repository test data
+    }
+
+    public static void testMethods(Repository ...repos) {
+        Arrays
+                .stream(repos)
+                .forEach(repo -> repo.save_data("test data"));
+    }
+
+}
+
+```
+
 
 * * *
 
