@@ -1,3 +1,55 @@
+**Python equivalent in Java for bilingual developers**
+
+Table of contents.
+
+1. Data structures
+    
+    a) Lists
+    
+    b) Tuples
+    
+    c) Sets
+    
+    d) Maps and dictionaries
+    
+    e) List comprehension
+    
+    f) Popular data structures
+    
+2. General programming
+    
+    a) Method signatures & type hints
+    
+    b) Lambda expressions
+    
+    c) Simple file read / write
+    
+    d) Basic HTTP client
+    
+    e) Errors & exceptions handling
+    
+    f) Generics
+    
+
+3. OOP
+
+    e) Objects encapsulation
+    
+    f) Inner classes
+    
+    g) Multiple inheritance
+    
+    h) Singleton patterns
+    
+    i) Polymorphism example
+
+4. Decorators & design patterns
+
+    a) Decorator and monkey patching
+
+    b) Builder pattern
+    
+---
 
 ## Data structures
 
@@ -668,6 +720,668 @@ public class Main {
 }
 ```
 
+### Lambda expressions
+##### Python
+
+Basic examples of lambda expression
+```python
+from functools import reduce
+from typing import Tuple, Dict, Any
+
+import math
+
+
+## Example 1
+
+# normal function
+def cube(y):
+    return y * y * y;
+
+
+# lambda version of the same function
+cube_lambda = lambda x: x * x * x
+
+print(cube_lambda(5))  # 125
+
+## Example 2
+
+square_root = lambda x: math.sqrt(x)
+
+print(square_root(16))  # 4.0
+
+## Example 3
+
+power_sum = lambda *a, **b: list(map(lambda x: x ** b.get("power", 1) * b.get("multiplier", 1) % b.get("modulo", 1), a))
+
+res = power_sum(1, 2, 3, power=2, multiplier=2, modulo=100)
+print(res)
+```
+
+**Mappers, Filters, Reducers**
+
+```python
+from functools import reduce
+from typing import Dict, Any
+from typing import Tuple
+
+
+## Example 4
+
+my_list = [1, 5, 6, 9, 11, 14, 15, 16]
+
+my_list = list(filter(lambda x: (x % 2 == 0), my_list))
+
+# Output: [4, 6, 8, 12]
+print(my_list)
+
+# 125
+# 4.0
+# [2, 8, 18]
+# [6, 14, 16]
+
+
+### Filter
+mylist = [5, 7, 22, 97, 54, 62, 77, 23, 73, 61]
+mylist_result = list(filter(lambda x: (x % 2 == 0), mylist))
+print(mylist_result)  # [22, 54, 62]
+
+### Mapper
+items = [1, 2, 3, 4, 5]
+def sqr(x): return x ** 2
+list(map(sqr, items))
+
+### Reducer example
+my_list = [15, 81, 10, 20, 52, 100]
+sum = reduce((lambda x, y: x + y), my_list)
+print(sum)  # 278
+
+# another reducer
+res = reduce(lambda x, y: x + y, [1, 2, 3, 4, 5, 6])
+print(res)  # 21
+
+## Filter and mapper
+words = ["my", "passion", "is", "hehe", "programming", "and", "finding", "new", "haha", "great", "ways"]
+forbidden_words = ["hehe", "haha"]
+final_list = " ".join(map(lambda y: y.upper(), filter(lambda x: not forbidden_words.__contains__(x), words)))
+print(final_list)
+
+# MY PASSION IS PROGRAMMING AND FINDING NEW GREAT WAYS
+
+
+# Another filter and mapper example
+class Amount:
+
+    default_rates: Dict[str, float] = {
+        "EUR": 1.0,
+        "RON": 5.2,
+        "PLN": 4.5
+    }
+
+    def __str__(self) -> str:
+        return "amount: {}, curency: {}".format(self.amount, self.curency)
+
+    def __init__(self, amount: float, curency: str) -> None:
+        self.amount = amount
+        self.curency = curency
+
+    def calcAmountInEur(self) -> float:
+        return self.amount * Amount.default_rates
+
+    @staticmethod
+    def get_big_wins_in_eur(wins: Tuple["Amount",...]) -> Any:
+
+        mappedToEur = map(lambda x: Amount(x.amount * Amount.default_rates.get(x.curency), "EUR"), wins).__iter__()
+
+        bigwin = lambda x: x.amount > 100
+
+        return list(filter(bigwin, mappedToEur))
+
+
+list_of_wins: Tuple[Amount, ...] = (Amount(110, "EUR"), Amount(25, "EUR"), Amount(520, "RON"), Amount(30, "PLN"))
+
+res: Tuple[Amount, ...] = Amount.get_big_wins_in_eur(list_of_wins)
+print(list(map(lambda x: str(x), res)))
+# ['amount: 110.0, curency: EUR', 'amount: 2704.0, curency: EUR', 'amount: 135.0, curency: EUR']
+
+
+# Example - mapping dictionaries with lambda expressions
+mydict = [{'name': 'english', 'rate': 10}, {'name': 'german', 'rate': 8}]
+
+mydict_r1 = map(lambda x: x['name'], mydict)
+print(*mydict_r1)  # english german
+
+mydict_r2 = map(lambda x: x['rate'] * 10, mydict)
+print(*mydict_r2)  # 100 80
+
+mydict_r3 = map(lambda x: x['name'] == "german", mydict)  # Output: [True, False]
+print(*mydict_r3)  # False True
+
+
+## More examples
+
+# sort list
+cities = ["New York", "Tokyo", "Warsaw", "London"]
+print(sorted(cities, key = lambda k: k.casefold())) # ['London', 'New York', 'Tokyo', 'Warsaw']
+
+nums = [-1, 14, -29, 33]
+print(sorted(nums, key = lambda n: n)) # [-29, -1, 14, 33]
+
+
+# sorting list of tuples
+def order_by_amount(point):
+    return point.amount
+
+listofw: Tuple[Amount, ...] = (Amount(110, "EUR"), Amount(25, "EUR"), Amount(520, "RON"), Amount(30, "PLN"))
+res = sorted(listofw, key=order_by_amount)
+print(list(map(lambda x: str(x), res)))
+# ['amount: 25, curency: EUR', 'amount: 30, curency: PLN', 'amount: 110, curency: EUR', 'amount: 520, curency: RON']
+
+
+```
+
+Basic lambda expressions in Java.
+
+##### Java
+```java
+package tests;
+import lombok.Data;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.*;
+
+/**
+ * Functional interface
+ */
+interface Testable {
+    int test(String a, Student b);
+}
+
+class Index {
+    int num;
+    Index(int num){
+        this.num = num;
+    }
+    int getIndexNumber(){
+        return num;
+    }
+}
+
+// example Student object
+// Lombok
+@Data
+class Student {
+
+    private String name;
+    private int age;
+
+    public Student(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public Optional<Index> getIndex() {
+        return Optional.of(new Index(331));
+    }
+}
+
+class Operations {
+
+    public static void consumeStudents(List<Student> students, Function<Student, String> function, Consumer<String> consumer) {
+        for (Student s : students) {
+            consumer.accept(function.apply(s));
+        }
+    }
+
+    public static List<Student> filterStudents(Supplier<List<Student>> supplier, Predicate<Student> predicate) {
+        List<Student> result = new ArrayList<>();
+
+        List<Student> students = supplier.get();
+
+        for (Student s : students) {
+            if (predicate.test(s)) { //sprawdz wzgledem predykatu Predicate i jak OK to OK
+                result.add(s);
+            }
+        }
+
+        return result;
+    }
+
+    public static List<Student> createData() {
+        List<Student> result = new ArrayList<>();
+        result.add(new Student("Adam", 31));
+        result.add(new Student("John", 29));
+
+        return result;
+    }
+
+    public static void testujStatycznaFunkcje(Student student) {
+        System.out.println("to jest nasz consumer");
+    }
+
+    public static void testujFuncReference(Consumer<Student> consumer) {
+        consumer.accept(new Student("Billy", 32));
+    }
+}
+
+public class App {
+
+    public static void main(String[] args) {
+
+
+        // ########## Example 1
+
+        // classic anonymous class on Runnable
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("runnable");
+            }
+        };
+
+        // lambda version
+        Runnable r2 = () -> {
+            System.out.println("runnable");
+        };
+
+
+        // ##### Example 2
+
+        // classic comparable
+        Comparable<String> comp1 = new Comparable<String>() {
+            @Override
+            public int compareTo(String o) {
+                return 0;
+            }
+        };
+
+        // lambda version
+        Comparable<String> comp2 = o -> 0;
+
+
+        // ##### Example 3
+
+        // lambda expression based on custom functional interface
+        Testable testElem = (String a, Student stnd) -> {
+            return 123;
+        };
+
+
+        // ##### Example 4 - Predicate, Consumer, Supplier, Function
+        
+        Predicate<Student> over30 = student -> student.getAge() > 30;
+        Predicate<Student> nameNotAdam = student -> student.getName() != "Adam";
+        Predicate<Student> nameNoIvan = student -> student.getName() != "Ivan";
+
+        // join predicates
+        Predicate<Student> polaczonaWartoscWieluPred = over30.and(nameNotAdam).or(nameNoIvan).negate();
+
+        // Consumer example
+        Consumer<String> print = text -> System.out.println(text);
+        Consumer<String> changeName = s -> {
+            System.out.println(s + "-superman");
+        };
+
+        // joining consumers together
+        Consumer<String> lancuchKonsumerow = print.andThen(changeName);
+
+        // Supplier example
+        Supplier<List<Student>> supplyPredefinedStudents = () -> Operations.createData();
+
+        // Function
+        Function<Student, String> getStudentName = student -> student.getName();
+
+        // Bi Function
+        BiFunction<Student, String, Integer> obrabiajZwrocWiek = (student, co) -> {
+            if (co == "wiek") return student.getAge();
+            return 20;
+        };
+
+        // BinaryOperator - classic anonymous class based on interface
+        BinaryOperator<Student> wspolnyKolega = new BinaryOperator<Student>() {
+            @Override
+            public Student apply(Student student, Student student2) {
+                return new Student("Ann", 23);
+            }
+        };
+
+        // lambda version
+        BinaryOperator<Student> wspolnyKolegaLambda = (student, student2) -> new Student("Ann", 23);
+
+
+        // ##### Example 5 - lambda expresssions based on primitive predicates
+
+        IntPredicate predInt2 = new IntPredicate() {
+            @Override
+            public boolean test(int value) {
+                return false;
+            }
+        };
+
+        IntSupplier is132 = () -> 0;
+        IntConsumer ic134 = value -> {
+        };
+        IntFunction if136 = value -> null;
+        IntSupplier is1322 = () -> 0;
+        IntConsumer ic1343 = value -> {
+        };
+        IntFunction if1362 = value -> null;
+
+
+        // ##### Example 6 - method's references
+
+        Consumer<Student> consStud = (Student s) -> Operations.testujStatycznaFunkcje(s);
+        Consumer<Student> consStud2 = Operations::testujStatycznaFunkcje;
+        Consumer<String> print179 = System.out::println;
+        Operations.testujFuncReference(Operations::testujStatycznaFunkcje);
+        Supplier<List<Student>> supplyPredefinedStudents4 = Operations::createData;
+        Function<Student, String> getStudentName192 = Student::getName;
+        Supplier<List<Student>> supplyPredefinedStudents210 = Operations::createData;
+
+
+        // ##### Example 7 - Optional
+
+        Student student = new Student("Ann", 23);
+        Optional<Index> index = student.getIndex();
+        if (index.isPresent()) {}
+        try {
+            Index indexOrThrow = student.getIndex().orElseThrow(() -> new Exception("No Index"));
+            Index indexOrNull = student.getIndex().orElseGet(null);
+            index.ifPresent(i -> {
+                System.out.println("index is fine");
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        index.orElse(new Index(1222));
+
+        // chaining map, filter and optional
+        index
+                //map
+                .map(i -> i.getIndexNumber())
+                //filter
+                .filter(indexNumber -> indexNumber.equals("213"))
+                //handle optional
+                .ifPresent(indexNumber -> System.out.println(indexNumber));
+
+
+
+        // chaining filter and supplied
+        Operations.consumeStudents(
+                Operations.filterStudents(supplyPredefinedStudents, over30), getStudentName, print
+        );
+
+    }
+
+}
+
+```
+
+Filters, transformers, mappers, generators.
+
+```java
+import lombok.Data;
+
+import java.util.*;
+import java.util.function.*;
+
+class Index {
+    int num;
+    Index(int num){
+        this.num = num;
+    }
+    int getIndexNumber(){
+        return num;
+    }
+}
+
+@Data
+class Student {
+
+    private String name;
+    private int age;
+
+    public Student() {
+        this.name = "no name";
+        this.age = 20;
+    }
+    public Student(String name) {
+        this.name = name;
+        this.age = 0;
+    }
+    public Student(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public Optional<Index> getIndex() {
+        return Optional.of(new Index(123));
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "name='" + name + '\'' +
+                '}';
+    }
+}
+
+/* custom functional interfaces */
+@FunctionalInterface
+interface MyProcessor<T>{
+    T process(T element);
+}
+
+@FunctionalInterface
+interface FilterInter<S>{
+    boolean testMatchB(S element);
+}
+
+@FunctionalInterface
+interface MyTransformer<T,S>{
+    T transform(S v);
+}
+
+@FunctionalInterface
+interface Operator<R,T,S>{
+    R oper(T v1, S v2);
+}
+
+class FilterTransformerGenerator {
+
+    static <T> List<T> findAll(Collection<T> src, Predicate<T> p) {
+        List<T> trg = new ArrayList<>();
+        for(T e : src) if(p.test(e)) trg.add(e);
+        return trg;
+    }
+
+    static <S,T> List<T> transform(Collection<S> src, Function<S,T> f) {
+        List<T> trg = new ArrayList<>();
+        for(S e : src) trg.add(f.apply(e));
+        return trg;
+    }
+
+    static <T> List<T> generate(int n, Supplier<T> s) {
+        List<T> trg = new ArrayList<>();
+        for(int i = 0; i < n; i++){
+            trg.add(s.get());   //nowy obiekt
+        }
+        return trg;
+    }
+
+    static <T> void process(Collection<T> src, Consumer<T> c) {
+        for(T e : src) c.accept(e);
+    }
+
+    public static <T,S> List<T> create(List<S> src, MyTransformer<T,S> t){
+        List<T> target = new ArrayList<>();
+        for(S s : src){
+            target.add(t.transform(s));
+        }
+        return target;
+    }
+
+    public static <R,T,S> List<R> create(List<T> src1, List<S> src2, Operator<R,T,S> o){
+        List<R> res = new ArrayList<>();
+        for(int i = 0; i < src1.size(); i++){
+            res.add(o.oper(src1.get(i), src2.get(i)));
+        }
+        return res;
+    }
+
+    public static FilterInter<String> funcDecorator(int argument){
+        return (String x) -> argument == 1 && x == "show_only_that";
+    }
+
+    static <T> T sConverter(T elementAlboCos, MyProcessor<T> funkcja){
+        return funkcja.process(elementAlboCos);
+    }
+
+}
+
+
+
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        List<Student> t = FilterTransformerGenerator.generate(10, Student::new);
+        List<Student> out = FilterTransformerGenerator.findAll(t, e -> e.getName() == "Adam");
+        FilterTransformerGenerator.process(out, e->e.setName(e.getName() == "no name" ? "John Doe" : e.getName()));
+        List<String> eett = FilterTransformerGenerator.transform(t, Student::getName);
+
+        Predicate<Student> mojPredykat1 =  e -> e.getName() == "Marc";
+        Predicate<Student> mojPredykat2 =  e -> e.getName() != "Ivan";
+        Predicate<Student> mojPredykat3 =  e -> e.getName() != "Adam";
+
+        // chained predicates
+        List<Student> out2 = FilterTransformerGenerator.findAll(t, mojPredykat1
+                .and(mojPredykat2)
+                .or(mojPredykat3)
+                .negate()
+        );
+
+        // compose operators
+        UnaryOperator<String> italic = e -> "<italic>" + e + "</italic>" ;
+        UnaryOperator<String> bold = e -> "<bold>" + e + "</bold>" ;
+        Function<String,String> kompoz1 = italic.compose(bold);
+        Function<String,String> kompoz2 = italic.andThen(bold);
+        String s5666 = "Abc def ghi";
+        kompoz1.apply(s5666);   //<bold><italic>Abc def ghi</italic></bold>
+        kompoz2.apply(s5666);   //<italic><bold>Abc def ghi</bold></italic>
+
+        //Konsumery [Consumer, BiConsumer]
+        Consumer<Student> podwyzszNumer = e -> e.setName("No name");
+        Consumer<Student> podizelPrzez10 = e -> e.setAge(e.getAge() - 1);
+        podwyzszNumer.andThen(podizelPrzez10);
+
+        // creators
+
+        List<String> s = Arrays.asList("dog", "cat", "fish");
+        List<String> sn = Arrays.asList("111", "222", "333");
+        List<Integer> pos = Arrays.asList(1,3);
+
+        List<String> outtest = FilterTransformerGenerator.create(s, e -> e.toUpperCase());
+        // or
+        List<String> outtest2 = FilterTransformerGenerator.create(s, String::toUpperCase);
+
+
+        List<Integer> l2 = FilterTransformerGenerator.create(sn, e -> Integer.parseInt(e));
+        // or
+        List<Integer> l3 = FilterTransformerGenerator.create(sn, Integer::parseInt);
+
+
+        List<Student> l4  = FilterTransformerGenerator.create(s, e -> new Student("d"));
+        // or
+        List<Student> l5 = FilterTransformerGenerator.create(s, Student::new);
+
+        String tekst_a = "dog and cat are at home";
+        List<Integer> l6 = FilterTransformerGenerator.create(s, e -> tekst_a.indexOf(e));
+        // or
+        List<Integer> l7 = FilterTransformerGenerator.create(s, tekst_a::indexOf);
+
+        // 3-args create
+        List<String> l8 = FilterTransformerGenerator.create(s, pos, (e1, e2) -> e1.substring(e2));
+        // or
+        List<String> l9 = FilterTransformerGenerator.create(s, pos, String::substring);
+
+        FilterInter<String> myFunc = FilterTransformerGenerator.funcDecorator(12);
+        myFunc.testMatchB("aba"); // false
+        myFunc.testMatchB("show_only_that"); // true
+
+
+        Integer intres = FilterTransformerGenerator.sConverter(10, n -> n * n * n);
+        String strres = FilterTransformerGenerator.sConverter(
+                "My String", n -> n + " add this ");
+    }
+
+}
+```
+
+Popular functional interfaces in Java API.
+```java
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        /* A) ActionListener  */
+
+        javax.swing.Timer timer5400 = new javax.swing.Timer(1000, e -> {
+            //do something
+        });
+
+
+        /* B) FileFilter, method: actionPerformed */
+
+        java.io.File[] files3408 = new java.io.File("/dir").listFiles(
+                f -> f.isFile()
+                        && f.getName().endsWith(".php")
+                        && f.lastModified() >= 1234567.12
+        );
+
+
+        /* C) Comparator (compare) */
+
+        List<String> myList = Arrays.asList("abcd", "efg", "hijk");
+
+        Collections.sort(myList, (s1, s2) -> s1.length() - s2.length());
+
+        SortedSet<String> testA5 = new TreeSet<>(
+                (s1, s2) -> {
+                    return 456;
+                }
+        );
+
+
+        /* D) Runnable - run() */
+
+        Future<?> ftask = Executors.newSingleThreadExecutor().submit(
+                () -> {
+                    int abc = 1;
+                }
+        );
+
+        
+        /* E) Callable - call() */
+
+        ExecutorService ex = Executors.newCachedThreadPool();
+        Future<String> task = ex.submit(
+                () -> new String("xxx")
+        );
+
+    }
+
+}
+```
+
 ### Simple file read / write
 ##### Python
 
@@ -910,6 +1624,17 @@ public class Main {
     }
 }
 ```
+
+### Generics
+##### Python
+Approach with **Singledispatch**. 
+
+see https://pypi.org/project/singledispatch/
+
+
+##### Java
+
+
 
 * * *
 
@@ -2627,5 +3352,305 @@ class MyHandler implements CustomHandler{
     {
         panel.setBackground(Color.RED);
     }
+}
+```
+
+### Builder pattern
+##### Python
+```python
+from abc import ABC, abstractmethod
+from typing import Any
+
+
+class Builder(ABC):
+    """
+    The Builder interface
+    """
+
+    @abstractmethod
+    def set_name(self, name: str) -> None:
+        pass
+
+    @abstractmethod
+    def set_price(self, price: float) -> None:
+        pass
+
+    @abstractmethod
+    def set_amount(self, amount: int) -> None:
+        pass
+
+    @abstractmethod
+    def add_ingredient(self, ingredient: str) -> None:
+        pass
+
+    @abstractmethod
+    def calculate_calories(self) -> int:
+        pass
+
+    @abstractmethod
+    def pack_product(self) -> None:
+        pass
+
+    @abstractmethod
+    def build(self) -> None:
+        pass
+
+
+class Product():
+
+    def __init__(self) -> None:
+        """
+        non arguments constructor
+        """
+        self.__name = ""
+        self.__price = None
+        self.__amount = None
+        self.__callories = None
+        self.parts = [] # ingredients
+
+    def __str__(self) -> None:
+        return f"Produc: {self.name}, price:{self.price}, ingredients: {', '.join(self.parts)}"
+
+    @property
+    def name(self) -> str:
+        return self.__name
+
+    @name.setter
+    def name(self, name: str) -> None:
+        self.__name = name
+
+    @property
+    def price(self) -> float:
+        return self.__price
+
+    @price.setter
+    def price(self, price: float) -> None:
+        self.__price = price
+
+    @property
+    def amount(self) -> int:
+        return self.__amount
+
+    @amount.setter
+    def amount(self, amount: int) -> None:
+        self.__amount = amount
+
+    def add_ingredient(self, part: str) -> None:
+        self.parts.append(part)
+
+    def calculate_calories(self) -> int:
+        print("calculate callories")
+        for i in self.parts:
+            self.__callories += 10
+
+        return self.__callories
+
+    def pack_product(self) -> None:
+        print("pack product")
+        pass
+
+class ProductBuilder(Builder):
+    """
+    The Concrete Builder classes follow the Builder interface and provide
+    specific implementations of the building steps. Your program may have
+    several variations of Builders, implemented differently.
+    """
+
+    def __init__(self) -> None:
+        """
+        A new builder instance should contain a blank product object
+        """
+        self.reset()
+
+    def reset(self) -> None:
+        """
+        Reset builder, create a new empty opject inside
+        """
+        self.__product = Product()
+
+    def __product(self) -> Product:
+        """
+        private product method, to disallow getting Product
+        and force us to use build() method instead
+        """
+        pass
+
+    def build(self) -> Product:
+        """
+        Build a Product object and return.
+        After build reset Builder to be prepared for further
+        usage and for any new builds
+        """
+        product = self.__product
+        self.reset()
+        return product
+
+    def set_name(self, name: str) -> None:
+        self.__product.name = name
+
+    def set_price(self, price: float) -> None:
+        self.__product.price = price
+
+    def set_amount(self, amount: int) -> None:
+        self.__product.amount = amount
+
+    def add_ingredient(self, ingredient: str) -> None:
+        self.__product.add_ingredient(ingredient)
+
+    def calculate_calories(self) -> int:
+        return self.__product.calculate_calories()
+
+    def pack_product(self) -> None:
+        self.__product.pack_product()
+
+
+class Director:
+    """
+    The Director is used if we want to order building steps in a
+    particular sequence.
+    """
+
+    def __init__(self) -> None:
+        self._builder = None
+
+    @property
+    def builder(self) -> Builder:
+        return self._builder
+
+    @builder.setter
+    def builder(self, builder: Builder) -> None:
+        """
+        The Director works with any builder instance that the client code passes
+        to it. This way, the client code may alter the final type of the newly
+        assembled product.
+        """
+        self._builder = builder
+
+    """
+    We can set up many various sequences of building process
+    """
+
+    def build_product_with_calories_info(self, name: str, amount: int) -> Any:
+        self.builder.set_name(name)
+        self.builder.set_amount(amount)
+        self.builder.calculate_calories()
+        return self.builder.build()
+
+    def build_product_and_pack(self, name: str, amount: int) -> Any:
+        self.builder.set_name(name)
+        self.builder.set_amount(amount)
+        self.builder.pack_product()
+        return self.builder.build()
+
+
+if __name__ == "__main__":
+
+    builder = ProductBuilder()
+
+    # #### build products
+
+    builder.set_name("Product 1")
+    builder.set_price(122.12)
+    builder.set_amount(30)
+    builder.add_ingredient("Ingredient A")
+    builder.add_ingredient("Ingredient B")
+    product1: Product = builder.build();
+
+    builder.set_name("Product 2")
+    builder.set_price(31.12)
+    builder.set_amount(10)
+    product2: Product = builder.build();
+
+    print(product1, product2)
+    print(product1 is product2)
+
+    # Produc: Product 1, price:122.12, ingredients: Ingredient A, Ingredient B Produc: Product 2, price:31.12, ingredients:
+    # False
+
+    # #### using Director for setting up building steps in an order
+    director = Director()
+    my_builder = ProductBuilder()
+    director.builder = my_builder
+    product3: Product = director.build_product_with_calories_info("Procut 3", 1)
+    product4: Product = director.build_product_and_pack("Procut 4", 1)
+    print(product3, product4)
+    # calculate
+    # callories
+    # pack product
+    # Produc: Procut 3, price: None, ingredients: Produc: Procut 4, price: None, ingredients:
+
+```
+##### Java
+```java
+import lombok.Data;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
+@Data
+class Product {
+
+    private String name;
+    private BigDecimal price;
+    private Integer amount;
+
+    private Product(String name, BigDecimal price, Integer amount) {
+        this.name = name;
+        this.price = price;
+        this.amount = amount;
+    }
+
+    /**
+     * Builder as an inner class inside our outer class
+     */
+    public static class ProductBuilder {
+
+        // some default values (recommended)
+        private String name;
+        private BigDecimal price;
+        private Integer amount = 1;
+
+        public ProductBuilder setName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public ProductBuilder setPrice(BigDecimal price) {
+            this.price = price.setScale(2, RoundingMode.HALF_DOWN);
+            return this;
+        }
+
+        public ProductBuilder setAmount(Integer amount) {
+            this.amount = amount;
+            return this;
+        }
+
+
+        public Product build() {
+
+            // Inner class ProductBuilder has an access to private constructor
+            // from outer class Product, so we can instantiate Product object here
+
+            return new Product(name, price, amount);
+        }
+    }
+}
+
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Product Product = new Product.ProductBuilder()
+                .setName("Car")
+                .setAmount(3)
+                .setPrice(new BigDecimal(10.15))
+                .build();
+
+        System.out.println(Product);
+        
+        // Product(name=Car, price=10.15, amount=3)
+    }
+
 }
 ```
