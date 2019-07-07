@@ -38,15 +38,15 @@ Table of contents.
 
 3. OOP
 
-    e) Objects encapsulation
+    a) Objects encapsulation
     
-    f) Inner classes
+    b) Inner classes
     
-    g) Multiple inheritance
+    c) Multiple inheritance
     
-    h) Singleton patterns
+    d) Singleton patterns
     
-    i) Polymorphism example
+    e) Polymorphism example
 
 4. Decorators & design patterns
 
@@ -1211,7 +1211,7 @@ class FilterTransformerGenerator {
     static <T> List<T> generate(int n, Supplier<T> s) {
         List<T> trg = new ArrayList<>();
         for(int i = 0; i < n; i++){
-            trg.add(s.get());   //nowy obiekt
+            trg.add(s.get()); 
         }
         return trg;
     }
@@ -1638,9 +1638,243 @@ see https://pypi.org/project/singledispatch/
 
 
 ##### Java
+Example of generics in Java.
+
+Generic class and methods.
+
+```java
+import lombok.*;
+import java.util.*;
+import java.util.function.Function;
+
+interface DomainObject{}
+interface DtoAble {}
+interface Dto{}
+interface ComparableByExperience<T extends Employee>{
+    int compareByExperience(T obj2);
+}
+
+@Data
+abstract class Person implements DomainObject {
+    protected String name;
+    protected int age;
+    protected int personUniqueId;
+
+    @Override
+    public String toString() {
+        return "[person]["+personUniqueId+"]";
+    }
+}
+
+@Getter @Setter @ToString(callSuper=true)
+class Employee extends Person implements ComparableByExperience<Employee> {
+
+    private int yearsOfExperience = 0;
+    private String name;
+
+    public Employee(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public int compareByExperience(Employee obj2) {
+        if(this.getYearsOfExperience() == obj2.getYearsOfExperience()){
+            return 0;
+        } else if(this.getYearsOfExperience() > obj2.getYearsOfExperience()) {
+            return 1;
+        } else {
+            return -1;
+        }
+    }
+}
+
+/**
+ * Contractor is not an Employee
+ */
+@Getter @Setter @ToString(callSuper=true)
+class Contractor extends Person {
+    public Contractor() {}
+}
+
+/**
+ * Supplier is not an Employee
+ */
+@Getter @Setter @ToString(callSuper=true)
+class Supplier extends Person {
+    public Supplier() {}
+}
+
+@Getter @Setter @ToString(callSuper=true)
+class Manager extends Employee {
+    public Manager(String name) {
+        super(name);
+    }
+}
+
+@Getter @Setter @ToString(callSuper=true)
+class UpperManager extends Manager {
+    public UpperManager(String name) {
+        super(name);
+    }
+}
+
+@Getter @Setter @ToString(callSuper=true)
+class Director extends UpperManager {
+    public Director(String name) {
+        super(name);
+    }
+}
+
+class EmployesByExperience<T extends Employee>
+{
+    private SortedSet<T> allEmployes = new TreeSet<T>(T::compareByExperience);
+
+    public EmployesByExperience(T ...employes) {
+        allEmployes.addAll(Arrays.asList(employes));
+    }
+
+    public T getTheMostExperienceEmployee(){
+        return this.allEmployes.first();
+    }
+
+    public T getTheLessExperiencedEmployee(){
+        return this.allEmployes.last();
+    }
+}
+
+class HROperations {
+
+    public static <S extends Employee, T extends Employee> List<T> updatePosition(List<S> employes, Function<S,T> update) {
+        List<T> trg = new ArrayList<>();
+        for(S e : employes) trg.add(update.apply(e));
+        return trg;
+    }
+
+    public static Map<? super Director, Boolean> informUpperManagement(
+            List<? super Director> people,
+            List<Class<? extends Person>> importantPositions
+    ) {
+
+        Map<Person, Boolean> informedPeople = new HashMap<>();
+
+        people.stream().filter(
+                p -> importantPositions
+                        .stream()
+                        .anyMatch(pos -> pos.isAssignableFrom(p.getClass()))
+        ).forEach(importantPerson -> {
+            // do some stuff... inform needed people
+            informedPeople.put((Person) importantPerson, true);
+        });
+
+        return informedPeople;
+    }
+
+}
+
+```
+
+Test 
+```java
+import lombok.*;
+import java.util.*;
+import java.util.function.Function;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Director director = new Director("John Doe");
+
+        UpperManager upperManager = new UpperManager("John Alan");
+        UpperManager upperManager2 = new UpperManager("Marie Dane");
+        UpperManager upperManager3 = new UpperManager("Adrien Doe");
+
+        Manager manager = new Manager("Miroslav Doe");
+        Manager manager2 = new Manager("Aaron Doe");
+        Manager manager3 = new Manager("Nikita Doe");
+
+        Employee employee = new Employee("Ivan Bee");
+        Employee employee2 = new Employee("Mark Doe");
+        Employee employee3 = new Employee("Johny Lee");
+
+        // ### test generic method with wildcards
+
+        List<Employee> people = Arrays.asList(
+                director,
+                upperManager,
+                upperManager2,
+                upperManager3,
+                manager,
+                manager2,
+                manager3,
+                employee,
+                employee2,
+                employee3
+        );
+
+        List<Class<? extends Person>> upperManagement = new ArrayList<>();
+        upperManagement.add(Director.class);
+        upperManagement.add(UpperManager.class);
+
+        // inform all upper managers
+        Map<? super Director, Boolean> informedPeople = HROperations.informUpperManagement(people, upperManagement);
+
+        System.out.println(informedPeople);
+        // {UpperManager(super=Manager(super=Employee(super=[person][0], yearsOfExperience=0, name=John Alan)))=true,
+        // UpperManager(super=Manager(super=Employee(super=[person][0], yearsOfExperience=0, name=Adrien Doe)))=true,
+        // UpperManager(super=Manager(super=Employee(super=[person][0], yearsOfExperience=0, name=Marie Dane)))=true,
+        // Director(super=UpperManager(super=Manager(super=Employee(super=[person][0], yearsOfExperience=0, name=John Doe))))=true}
 
 
 
+        // ### test generic class
+
+        director.setYearsOfExperience(20);
+        upperManager.setYearsOfExperience(4);
+        manager.setYearsOfExperience(22);
+        employee.setYearsOfExperience(24);
+
+        EmployesByExperience<Employee> EmployesByExperience = new EmployesByExperience(
+            director,
+            upperManager,
+            manager,
+            employee
+        );
+
+        System.out.println(EmployesByExperience.getTheLessExperiencedEmployee());
+        System.out.println(EmployesByExperience.getTheMostExperienceEmployee());
+
+        /* result
+        Employee(super=[person][0], yearsOfExperience=24, name=Ivan Bee)
+        UpperManager(super=Manager(super=Employee(super=[person][0], yearsOfExperience=4, name=John Alan)))
+        */
+
+
+
+        // ### test another generic method - transformer
+
+        // give a bonus to all managers or upper managers or director with more then 20 years of experience
+
+        HROperations.updatePosition(people, person -> {
+
+            if(person instanceof Manager) {
+                if(person.getYearsOfExperience() > 20){
+                    System.out.println("Give a bonus to: " + person);
+                }
+            }
+
+            return person;
+        });
+
+        /*
+        result:
+        Give a bonus to: Manager(super=Employee(super=[person][0], yearsOfExperience=22, name=Miroslav Doe))
+         */
+
+    }
+
+}
+```
 * * *
 
 
