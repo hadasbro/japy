@@ -6,13 +6,18 @@ Table of contents.
     
     a) Lists
     
+    
     b) Tuples
+    
     
     c) Sets
     
+    
     d) Maps and dictionaries
     
+    
     e) List comprehension
+    
     
     f) Popular data structures
     
