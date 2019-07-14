@@ -1862,7 +1862,7 @@ class StaticLogger:
     _logger = None
 
     @staticmethod
-    def log(obj: List[User], log_producer: Callable[[Type[User]], str] = None) -> None:
+    def log(obj: List[User], log_producer: Callable[[Type[User]], str] = lambda el: str(el)) -> None:
         if StaticLogger._logger is None:
             logging.basicConfig(level=logging.INFO)
             StaticLogger._logger = logging.getLogger("static_logger")
