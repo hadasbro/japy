@@ -1818,7 +1818,7 @@ log_state(1, 2, 3, 4, 5)
 
 ```
 
-Example with custom logger/pronter and handler passed to logger as a parameter.
+Example with custom logger/printer and handler passed to logger as a parameter.
 
 ```python
 
