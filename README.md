@@ -485,6 +485,12 @@ More examples:
 ```python
 # type aliases
 
+from typing import (Any,
+                    Callable,
+                    Dict,
+                    Tuple,
+                    TypeVar)
+
 T = TypeVar('T', int, float, complex)
 Vector = Iterable[Tuple[T, T]]
 
@@ -518,6 +524,26 @@ def zero_all_vars(vars: Iterable[LoggedVar[int]]) -> None:
 def handle_employees(e: Union[Employee, Sequence[Employee]]) -> None:
     if isinstance(e, Employee):
         e = [e]
+
+
+# callale
+AnyCallable = Callable[..., Any]
+
+# type var
+Domain = TypeVar('Domain')
+
+# map
+Operator = Map[Domain, Domain]
+
+# tuple with strings only (no matter how many)
+Keys = Tuple[str, ...]
+
+# tuple with Domain type objects
+Types = Tuple[Domain , ...]
+
+# dict
+Registry = Dict[int, Dict[Types, Dict[Keys, Dict[Types, AnyCallable]]]]
+
 
 ```
 
@@ -1636,6 +1662,248 @@ Approach with **Singledispatch**.
 
 see https://pypi.org/project/singledispatch/
 
+Example:
+
+```python
+import logging
+from abc import ABC, abstractmethod
+from datetime import datetime
+from functools import singledispatch
+from typing import Union, Dict
+
+
+############# classes ##################
+
+class Stringifable(ABC):
+    """
+    The Stringifable interface
+    """
+
+    @abstractmethod
+    def get_as_string(self) -> str:
+        pass
+
+
+
+class ObjectStateLogger(ABC):
+    """
+    The Loggable interface
+    """
+
+    def __init__(self,plevel=logging.INFO,pname='general.log'):
+        logging.basicConfig(level=plevel)
+        self.__logger = logging.getLogger(pname)
+
+    def log_stringifable(self) -> None:
+        if isinstance(self, Stringifable):
+            self.__logger.info(self.get_as_string())
+        else:
+            raise Exception("Not Stringifable element")
+
+
+class StaticLogger:
+    """
+    Default, simple static logger
+    """
+    _logger = None
+
+    @staticmethod
+    def log(msg: str, name: str = 'static_logger') -> None:
+        if StaticLogger._logger is None:
+            logging.basicConfig(plevel=logging.INFO)
+            StaticLogger._logger = logging.getLogger(name)
+
+        StaticLogger._logger.info(msg)
+
+
+
+############# example of objects (entities) ##################
+
+class EntityTag(ABC):
+    pass
+
+class SimpleEntityTag(ABC):
+    pass
+
+class Entity(ObjectStateLogger, Stringifable, EntityTag):
+    """
+    Example of Entity object
+    """
+    def __str__(self) -> str:
+        key_val: Dict[str,str] = {}
+        for i in vars(self):
+            istr: str = i.strip(' ').replace('_ObjectStateLogger','').replace('_Stringifable','')
+            if istr.startswith('__'):
+                continue
+            key_val[istr] = vars(self)[i]
+
+        return key_val
+
+    def __init__(self, name: str = None):
+        super().__init__()
+        self.name = name
+
+    def get_as_string(self) -> str:
+        return f'[ {datetime.now().strftime("%Y-%m-%d %H:%M:%S")} ] [ {self.__class__} ] {self.__str__()}'
+
+
+
+class SimpleEntity(Stringifable,SimpleEntityTag):
+    """
+    Another example of entity
+    """
+    def __init__(self, name: str = None):
+        super().__init__()
+        self.name = name
+
+    def get_as_string(self) -> str:
+        return f'[ {datetime.now().strftime("%Y-%m-%d %H:%M:%S")} ] [ {self.__class__} ] {self.name}'
+
+
+
+
+############# Single Dispatch - register some loggers ##################
+
+@singledispatch
+def log_state(obj):
+    raise NotImplementedError("Cannot log state for this object")
+
+
+"""
+Register logger objects with included logger (extending ObjectStateLogger)
+"""
+@log_state.register(ObjectStateLogger)
+def _(obj:Union[ObjectStateLogger,Stringifable]):
+
+    if not (isinstance(obj,ObjectStateLogger) and isinstance(obj,Stringifable)):
+        raise NotImplementedError("Object must be Union[ObjectStateLogger, Stringifable]")
+
+    try:
+        obj.log_stringifable()
+    except Exception as e:
+        print(e)
+
+
+"""
+Register another logger for siple objects without any other logger inside
+"""
+@log_state.register(Stringifable)
+def _(obj: Stringifable):
+    try:
+        StaticLogger.log(obj.get_as_string())
+    except Exception as e:
+        print(e)
+
+"""
+Register one more logger for simple integers
+"""
+@log_state.register(int)
+def _(*obj: int):
+    try:
+        StaticLogger.log(f'List of integers: {obj}')
+    except Exception as e:
+        print(e)
+
+
+
+log_state(Entity("My entity"))
+log_state(SimpleEntity("My simple entity"))
+log_state(1, 2, 3, 4, 5)
+
+
+# Results:
+# INFO:general.log:[ 2019-07-14 20:47:56 ] [ <class '__main__.Entity'> ] {'name': 'My entity'}
+# INFO:static_logger:[ 2019-07-14 20:47:56 ] [ <class '__main__.SimpleEntity'> ] My simple entity
+# INFO:static_logger:List of integers: (1, 2, 3, 4, 5)
+
+```
+
+Example with custom logger/pronter and handler passed to logger as a parameter.
+
+```python
+
+###### test classes ######
+
+class User:
+    """
+    User class
+    """
+    def __str__(self) -> Any:
+        return f'{self.__class__.__name__ } {{{self.name}}}'
+
+    def __init__(self, name):
+        self.name = name
+
+
+class GreatUser(User):
+    """
+    GreatUser class
+    """
+    def __init__(self, name):
+        super().__init__(name)
+
+
+class SuperUser(User):
+    """
+    SuperUser class
+    """
+    def __init__(self, name):
+        super().__init__(name)
+
+
+
+
+###### static logger  ######
+
+class StaticLogger:
+    """
+    Default, simple static logger
+    """
+    _logger = None
+
+    @staticmethod
+    def log(obj: List[User], log_producer: Callable[[Type[User]], str] = None) -> None:
+        if StaticLogger._logger is None:
+            logging.basicConfig(level=logging.INFO)
+            StaticLogger._logger = logging.getLogger("static_logger")
+            pass
+
+        """
+        call custom handler
+        """
+        for i in obj:
+            log_producer(i)
+
+
+
+######### Logger registration ########
+
+@singledispatch
+def log_objects(obj):
+    raise NotImplementedError("Cannot log state for this object")
+
+
+"""
+Register logger 
+"""
+@log_objects.register(User)
+def _(*obj:User):
+    try:
+        StaticLogger.log(obj, lambda uobj: print("User Logger: " + str(uobj)))
+    except Exception as e:
+        print(e)
+
+
+log_objects(User("Normal user"), GreatUser("Great user"), SuperUser("Great user"))
+
+# Result:
+# User Logger: User {Normal user}
+# User Logger: GreatUser {Great user}
+# User Logger: SuperUser {Great user}
+
+
+
+```
 
 ##### Java
 Example of generics in Java.
