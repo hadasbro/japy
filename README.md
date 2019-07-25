@@ -1,7 +1,7 @@
-**Python equivalent in Java for bilingual developers**
-
 ![picture](https://img.shields.io/badge/Java-11.0.1-brightgreen.svg)
 ![picture](https://img.shields.io/badge/Python-3.7.4-blue.svg)
+
+**Python equivalent in Java for bilingual developers**
 
 Table of contents.
 
