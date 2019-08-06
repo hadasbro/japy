@@ -841,7 +841,6 @@ print(final_list)
 
 # MY PASSION IS PROGRAMMING AND FINDING NEW GREAT WAYS
 
-
 # Another filter and mapper example
 class Amount:
 
